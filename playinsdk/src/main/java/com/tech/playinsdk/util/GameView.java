@@ -15,8 +15,6 @@ import com.tech.playinsdk.model.entity.PlayInfo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
-
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, VideoDecoder.DecoderListener {
 
@@ -86,7 +84,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     protected void onWindowVisibilityChanged(int visibility) {
         super.onWindowVisibilityChanged(visibility);
         this.visibility = visibility;
-        PlayLog.e("onWindowVisibilityChanged  : " + visibility);
     }
 
     @Override
@@ -189,11 +186,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         public void onMessage(int streamType, byte[] buf) {
             if (GameView.this.visibility == 0) {
                 if (streamType == Constants.StreamType.H264) {
-                    videodecoder.sendVideoData(buf);
+                    if (null != videodecoder) videodecoder.sendVideoData(buf);
                 } else if (streamType == Constants.StreamType.PCM) {
-                    audioDecoder.sendAudioData(buf);
+                    if (null != audioDecoder) audioDecoder.sendAudioData(buf);
                 }
-//                PlayLog.e("onMessage --->  streamType:  " + streamType + "    " + Arrays.toString(buf));
             }
         }
 

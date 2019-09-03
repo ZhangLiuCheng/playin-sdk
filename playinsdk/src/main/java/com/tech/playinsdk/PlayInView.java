@@ -2,16 +2,19 @@ package com.tech.playinsdk;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tech.playinsdk.http.HttpException;
+import com.tech.playinsdk.http.HttpHelper;
 import com.tech.playinsdk.listener.HttpListener;
 import com.tech.playinsdk.listener.PlayListener;
 import com.tech.playinsdk.model.entity.PlayInfo;
@@ -24,23 +27,14 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private PlayInfo playInfo;
     private PlayListener playListener;
 
-//    private String appName;
-//    private String appCover;
-//    private String appIcon;
-//    private String appUrl;
     private int playDuration;
-    private int playTime;
-    private int leftDuration;
-    private int leftTime;
+    private int countDuration;
 
     private GameView gameView;
-
     private View playingView;
     private View finishView;
 
-    private TextView countView;
-//    private View continueView;
-
+    private boolean isDetachedFromWindow;
 
     public PlayInView(Context context) {
         super(context);
@@ -55,21 +49,20 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        isDetachedFromWindow = true;
         getHandler().removeCallbacksAndMessages(null);
+        reportPlayEnd();
     }
 
     /**
      * playGame
+     *
      * @param adid
      * @param playDuration
-     * @param playTime
      * @param listener
      */
-    public void play(String adid, int playDuration, int playTime, final PlayListener listener) {
+    public void play(String adid, int playDuration, final PlayListener listener) {
         this.playDuration = playDuration;
-        this.playTime = playTime;
-        this.leftDuration = playDuration / playTime;
-        this.leftTime = playTime;
         this.playListener = listener;
         this.requestPlayInfo(adid);
     }
@@ -77,9 +70,9 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private void initGameView() {
         LayoutInflater.from(getContext()).inflate(R.layout.playin_view, this);
         gameView = findViewById(R.id.gameview);
-        countView = findViewById(R.id.countDownTv);
         playingView = findViewById(R.id.playingView);
         finishView = findViewById(R.id.finishView);
+        finishView.setOnClickListener(this);
     }
 
     @Override
@@ -111,8 +104,10 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             playListener.onPlayClose();
         } else if ("install".equals(tag)) {
             goDownload();
-        } else if ("continue".equals(tag)) {
-            continueGame();
+        }
+
+        if (v.getId() == R.id.finishView) {
+            finishView.setVisibility(GONE);
         }
     }
 
@@ -120,32 +115,35 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         PlayInSdk.getInstance().userActions(adid, new HttpListener<PlayInfo>() {
             @Override
             public void success(PlayInfo result) {
-                PlayInView.this.playInfo = result;
-                PlayInView.this.gameView.startConnect(playInfo, PlayInView.this);
-//                addPlayingInfo();
-//                addPlayFinish();
+                if (isDetachedFromWindow) return;
+                initData(result);
+                playInfo = result;
+                countDuration = Math.min(playDuration, result.getDuration());
+                gameView.startConnect(playInfo, PlayInView.this);
             }
 
             @Override
             public void failure(final HttpException userActionExc) {
                 playListener.onPlayError(userActionExc);
-                // first get the game Cover and call back onPlayError to solve the process of loading pictures
-//                HttpHelper.obtian().getHttpBitmap(PlayInView.this.appCover, new HttpListener<Bitmap>() {
-//                    @Override
-//                    public void success(Bitmap result) {
-//                        playListener.onPlayError(userActionExc);
-//                        showInstallWithoutMobile(result);
-//                    }
-//                    @Override
-//                    public void failure(HttpException e) {
-//                        playListener.onPlayError(userActionExc);
-//                    }
-//                });
             }
         });
     }
 
+    private void initData(PlayInfo playInfo) {
+        final ImageView appIcon = findViewById(R.id.appIcon);
+        HttpHelper.obtian().getHttpBitmap("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1567520583167&di=63d09991b1d38d15bc100be6f6b81b1d&imgtype=0&src=http%3A%2F%2Fpic39.nipic.com%2F20140321%2F18063302_210604412116_2.jpg", new HttpListener<Bitmap>() {
+            @Override
+            public void success(Bitmap result) {
+                appIcon.setImageBitmap(result);
+            }
 
+            @Override
+            public void failure(HttpException e) {
+                PlayLog.e("获取APP Icon图片失败:  " + e);
+            }
+        });
+
+    }
 
     private void goDownload() {
         reportDownload();
@@ -165,15 +163,14 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void startCount() {
-        leftDuration = playDuration / playTime;
-        countView.setText(leftDuration + "");
-
+        final TextView countView = findViewById(R.id.countDownTv);
+        countView.setText(countDuration + "");
         getHandler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                countView.setText(leftDuration + "");
-                leftDuration--;
-                if (leftDuration >= 0) {
+                countView.setText(countDuration + "");
+                countDuration--;
+                if (countDuration >= 0) {
                     getHandler().postDelayed(this, 1000);
                 } else {
                     showPlayFinish();
@@ -183,24 +180,12 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         }, 1000);
     }
 
-    private void continueGame() {
-        leftTime--;
-
-        playingView.setVisibility(VISIBLE);
-        finishView.setVisibility(GONE);
-        if (leftTime <= 1) {
-//            continueView.setVisibility(GONE);
-        }
-        startCount();
-    }
-
     private void showPlayFinish() {
         playingView.setVisibility(GONE);
         finishView.setVisibility(VISIBLE);
     }
 
     private void showError() {
-//        continueView.setVisibility(GONE);
         playingView.setVisibility(GONE);
         finishView.setVisibility(VISIBLE);
     }
@@ -212,7 +197,8 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void reportPlayEnd() {
-        if (leftTime <= 1 && null != playInfo && !TextUtils.isEmpty(playInfo.getToken())) {
+        PlayLog.e("reportPlayEnd");
+        if (/*leftTime <= 1 && */null != playInfo && !TextUtils.isEmpty(playInfo.getToken())) {
             PlayInSdk.getInstance().report(playInfo.getToken(), Constants.Report.END_PLAY);
         }
     }
