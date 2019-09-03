@@ -6,7 +6,7 @@ import android.view.View;
 
 import com.tech.playinsdk.PlayInView;
 import com.tech.playinsdk.listener.PlayListener;
-import com.tech.playinsdk.util.PILog;
+import com.tech.playinsdk.util.PlayLog;
 
 public class PlayActivity extends AppCompatActivity implements PlayListener {
 
@@ -44,7 +44,7 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
 
     @Override
     public void onPlayError(Exception ex) {
-        PILog.e("onPlayError " + ex);
+        PlayLog.e("onPlayError " + ex);
     }
 
     private void hideLoading() {

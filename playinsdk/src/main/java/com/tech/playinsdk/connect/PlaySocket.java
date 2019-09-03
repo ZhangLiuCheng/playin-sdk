@@ -1,7 +1,7 @@
 package com.tech.playinsdk.connect;
 
-import com.tech.playinsdk.util.Tool;
-import com.tech.playinsdk.util.PILog;
+import com.tech.playinsdk.util.Common;
+import com.tech.playinsdk.util.PlayLog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +54,7 @@ public abstract class PlaySocket extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Tool.closeStream(istream, ostream);
+        Common.closeStream(istream, ostream);
     }
 
     public void sendText(String text) {
@@ -80,14 +80,14 @@ public abstract class PlaySocket extends Thread {
 
     @Override
     public void run() {
-        PILog.v("Socket begin to connect  ip: " + ip + " port:" + port);
+        PlayLog.v("Socket begin to connect  ip: " + ip + " port:" + port);
         try {
             socket = new Socket(ip, port);
             socket.setSoTimeout(0);
             socket.setReceiveBufferSize(100 * 1024);
             socket.setSendBufferSize(1024);
             socket.setTcpNoDelay(true);
-            PILog.v("Socket connect successed");
+            PlayLog.v("Socket connect successed");
             onOpen();
             istream = socket.getInputStream();
             ostream = socket.getOutputStream();
@@ -97,7 +97,7 @@ public abstract class PlaySocket extends Thread {
             // 读取数据流(循环阻塞)
             readData();
         } catch (SocketException ex) {
-            PILog.e("Socket connect error： " + ex);
+            PlayLog.e("Socket connect error： " + ex);
             onError(ex);
         } catch (IOException ex) {
             onError(ex);
@@ -133,7 +133,7 @@ public abstract class PlaySocket extends Thread {
                 }
             } catch (InterruptedException e) {
             } catch (IOException e) {
-                PILog.e("Socket send error： " + e);
+                PlayLog.e("Socket send error： " + e);
                 onError(e);
             }
         }

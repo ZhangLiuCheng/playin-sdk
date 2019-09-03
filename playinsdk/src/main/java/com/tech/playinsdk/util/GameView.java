@@ -1,4 +1,4 @@
-package com.tech.playinsdk;
+package com.tech.playinsdk.util;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
@@ -10,13 +10,12 @@ import com.tech.playinsdk.connect.PlaySocket;
 import com.tech.playinsdk.decoder.BaseDecoder;
 import com.tech.playinsdk.decoder.FFmpegDecoder;
 import com.tech.playinsdk.model.entity.PlayInfo;
-import com.tech.playinsdk.util.Constants;
-import com.tech.playinsdk.util.PILog;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
-class PlayInteract extends SurfaceView implements SurfaceHolder.Callback, BaseDecoder.DecoderListener {
+public class GameView extends SurfaceView implements SurfaceHolder.Callback, BaseDecoder.DecoderListener {
 
     public interface GameListener {
         void onGameStart();
@@ -32,12 +31,12 @@ class PlayInteract extends SurfaceView implements SurfaceHolder.Callback, BaseDe
     private PlaySocket playSocket;
     private int visibility;
 
-    public PlayInteract(Context context) {
+    public GameView(Context context) {
         super(context);
         init();
     }
 
-    public PlayInteract(Context context, AttributeSet attrs) {
+    public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
@@ -143,7 +142,7 @@ class PlayInteract extends SurfaceView implements SurfaceHolder.Callback, BaseDe
             obj.put("coder", "annex-b");  // 安卓annex-b, 苹果avcc
             playSocket.sendText(obj.toString());
         } catch (Exception ex) {
-            PILog.e("sendUserContect  exception :" + ex);
+            PlayLog.e("sendUserContect  exception :" + ex);
         }
     }
 
@@ -155,7 +154,7 @@ class PlayInteract extends SurfaceView implements SurfaceHolder.Callback, BaseDe
 
         @Override
         public void onOpen() {
-            PILog.v("MyPlaySocket --> onMessage  onOpen ");
+            PlayLog.v("MyPlaySocket --> onMessage  onOpen ");
             sendUserContect();
             if (playInfo.getOsType() == 2) {
                 sendMessageToAndroid();
@@ -164,7 +163,7 @@ class PlayInteract extends SurfaceView implements SurfaceHolder.Callback, BaseDe
 
         @Override
         public void onMessage(String msg) {
-            PILog.v("MyPlaySocket --> onMessage  msg " + msg);
+            PlayLog.v("MyPlaySocket --> onMessage  msg " + msg);
             try {
                 JSONObject object = new JSONObject(msg);
                 if (0 != object.optInt("code") && null != playListener) {
@@ -177,14 +176,14 @@ class PlayInteract extends SurfaceView implements SurfaceHolder.Callback, BaseDe
 
         @Override
         public void onMessage(byte[] buf) {
-            if (PlayInteract.this.visibility == 0) {
+            if (GameView.this.visibility == 0) {
                 decoder.sendVideoData(buf);
             }
         }
 
         @Override
         public void onError(Exception ex) {
-            PILog.v("MyPlaySocket --> onError  " + ex);
+            PlayLog.v("MyPlaySocket --> onError  " + ex);
             if (null != playListener) {
                 playListener.onGameError(ex);
             }

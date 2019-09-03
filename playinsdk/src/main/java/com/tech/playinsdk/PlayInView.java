@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -23,12 +22,12 @@ import android.widget.Toast;
 
 import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.http.HttpHelper;
-import com.tech.playinsdk.http.HttpListener;
+import com.tech.playinsdk.listener.HttpListener;
 import com.tech.playinsdk.listener.PlayListener;
 import com.tech.playinsdk.model.entity.PlayInfo;
-import com.tech.playinsdk.util.BitmapUtil;
 import com.tech.playinsdk.util.Constants;
-import com.tech.playinsdk.util.PILog;
+import com.tech.playinsdk.util.GameView;
+import com.tech.playinsdk.util.PlayLog;
 import com.tech.playinsdk.util.ResHelper;
 
 public class PlayInView extends FrameLayout implements View.OnClickListener, GameView.GameListener {
@@ -168,7 +167,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             getContext().startActivity(intent);
         } catch (Exception ex) {
             ex.printStackTrace();
-            PILog.e("download app error：" + ex);
+            PlayLog.e("download app error：" + ex);
         }
     }
 
@@ -242,8 +241,8 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
         // fuzzy background
         RelativeLayout botLayout = new RelativeLayout(context);
-        botLayout.setBackgroundDrawable(new BitmapDrawable(context.getResources(),
-                BitmapUtil.rsBlur(context, coverBitmap, 25)));
+//        botLayout.setBackgroundDrawable(new BitmapDrawable(context.getResources(),
+//                BitmapUtil.rsBlur(context, coverBitmap, 25)));
         RelativeLayout.LayoutParams botParams = new RelativeLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 260, dm);
@@ -291,7 +290,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
             @Override
             public void failure(HttpException e) {
-                PILog.e("获取APP Icon图片失败:  " + e);
+                PlayLog.e("获取APP Icon图片失败:  " + e);
             }
         });
 
