@@ -2,53 +2,44 @@ package com.tech.playinsdk;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tech.playinsdk.http.HttpException;
-import com.tech.playinsdk.http.HttpHelper;
 import com.tech.playinsdk.listener.HttpListener;
 import com.tech.playinsdk.listener.PlayListener;
 import com.tech.playinsdk.model.entity.PlayInfo;
 import com.tech.playinsdk.util.Constants;
 import com.tech.playinsdk.util.GameView;
 import com.tech.playinsdk.util.PlayLog;
-import com.tech.playinsdk.util.ResHelper;
 
 public class PlayInView extends FrameLayout implements View.OnClickListener, GameView.GameListener {
 
     private PlayInfo playInfo;
     private PlayListener playListener;
 
-    private String appName;
-    private String appCover;
-    private String appIcon;
-    private String appUrl;
+//    private String appName;
+//    private String appCover;
+//    private String appIcon;
+//    private String appUrl;
     private int playDuration;
     private int playTime;
     private int leftDuration;
     private int leftTime;
 
     private GameView gameView;
+
     private View playingView;
     private View finishView;
+
     private TextView countView;
-    private View continueView;
+//    private View continueView;
 
 
     public PlayInView(Context context) {
@@ -74,18 +65,21 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
      * @param playTime
      * @param listener
      */
-    public void play(String adid, String appName, String appIcon, String appCover,
-                     String appUrl, int playDuration, int playTime, final PlayListener listener) {
-        this.appName = appName;
-        this.appCover = appCover;
-        this.appIcon = appIcon;
-        this.appUrl = appUrl;
+    public void play(String adid, int playDuration, int playTime, final PlayListener listener) {
         this.playDuration = playDuration;
         this.playTime = playTime;
         this.leftDuration = playDuration / playTime;
         this.leftTime = playTime;
         this.playListener = listener;
         this.requestPlayInfo(adid);
+    }
+
+    private void initGameView() {
+        LayoutInflater.from(getContext()).inflate(R.layout.playin_view, this);
+        gameView = findViewById(R.id.gameview);
+        countView = findViewById(R.id.countDownTv);
+        playingView = findViewById(R.id.playingView);
+        finishView = findViewById(R.id.finishView);
     }
 
     @Override
@@ -128,41 +122,40 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             public void success(PlayInfo result) {
                 PlayInView.this.playInfo = result;
                 PlayInView.this.gameView.startConnect(playInfo, PlayInView.this);
-                addPlayingInfo();
-                addPlayFinish();
+//                addPlayingInfo();
+//                addPlayFinish();
             }
 
             @Override
             public void failure(final HttpException userActionExc) {
+                playListener.onPlayError(userActionExc);
                 // first get the game Cover and call back onPlayError to solve the process of loading pictures
-                HttpHelper.obtian().getHttpBitmap(PlayInView.this.appCover, new HttpListener<Bitmap>() {
-                    @Override
-                    public void success(Bitmap result) {
-                        playListener.onPlayError(userActionExc);
-                        showInstallWithoutMobile(result);
-                    }
-                    @Override
-                    public void failure(HttpException e) {
-                        playListener.onPlayError(userActionExc);
-                    }
-                });
+//                HttpHelper.obtian().getHttpBitmap(PlayInView.this.appCover, new HttpListener<Bitmap>() {
+//                    @Override
+//                    public void success(Bitmap result) {
+//                        playListener.onPlayError(userActionExc);
+//                        showInstallWithoutMobile(result);
+//                    }
+//                    @Override
+//                    public void failure(HttpException e) {
+//                        playListener.onPlayError(userActionExc);
+//                    }
+//                });
             }
         });
     }
 
-    private void initGameView() {
-        gameView = new GameView(getContext());
-        addView(gameView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-    }
+
 
     private void goDownload() {
         reportDownload();
-        if (TextUtils.isEmpty(appUrl) || "null".equals(appUrl)) {
+        String downloadUrl = playInfo.getGoogleplayUrl();
+        if (TextUtils.isEmpty(downloadUrl) || "null".equals(downloadUrl)) {
             Toast.makeText(getContext(), "There is no googlePlay download url", Toast.LENGTH_SHORT).show();
             return;
         }
         try {
-            Uri uri = Uri.parse(this.appUrl);
+            Uri uri = Uri.parse(downloadUrl);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             getContext().startActivity(intent);
         } catch (Exception ex) {
@@ -196,7 +189,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         playingView.setVisibility(VISIBLE);
         finishView.setVisibility(GONE);
         if (leftTime <= 1) {
-            continueView.setVisibility(GONE);
+//            continueView.setVisibility(GONE);
         }
         startCount();
     }
@@ -207,7 +200,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void showError() {
-        continueView.setVisibility(GONE);
+//        continueView.setVisibility(GONE);
         playingView.setVisibility(GONE);
         finishView.setVisibility(VISIBLE);
     }
@@ -224,6 +217,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         }
     }
 
+    /*
     // No device, show installation
     private void showInstallWithoutMobile(Bitmap coverBitmap) {
         final Context context = getContext();
@@ -272,7 +266,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         name.setTextColor(Color.parseColor("#FFFFFF"));
         name.setTypeface(name.getTypeface(), Typeface.BOLD_ITALIC);
         name.setGravity(Gravity.CENTER);
-        name.setText(this.appName);
+//        name.setText(this.appName);
         LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT);
         int marginTop = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, dm);
@@ -281,18 +275,18 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
         // install button
         addIntallBtn(fcLayout);
-
-        HttpHelper.obtian().getHttpBitmap(this.appIcon, new HttpListener<Bitmap>() {
-            @Override
-            public void success(Bitmap result) {
-                icon.setImageBitmap(result);
-            }
-
-            @Override
-            public void failure(HttpException e) {
-                PlayLog.e("获取APP Icon图片失败:  " + e);
-            }
-        });
+//
+//        HttpHelper.obtian().getHttpBitmap(this.appIcon, new HttpListener<Bitmap>() {
+//            @Override
+//            public void success(Bitmap result) {
+//                icon.setImageBitmap(result);
+//            }
+//
+//            @Override
+//            public void failure(HttpException e) {
+//                PlayLog.e("获取APP Icon图片失败:  " + e);
+//            }
+//        });
 
     }
 
@@ -461,4 +455,5 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         layout.addView(continueBtn, params);
         return continueBtn;
     }
+    */
 }

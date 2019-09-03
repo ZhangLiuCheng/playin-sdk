@@ -6,12 +6,11 @@ import android.view.SurfaceHolder;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class BaseDecoder implements Runnable {
+public abstract class VideoDecoder implements Runnable {
 
     public interface DecoderListener {
         void decoderSuccess();
     }
-
 
     private BlockingQueue<byte[]> videoQueue = new LinkedBlockingQueue<>(30);
 
@@ -26,7 +25,7 @@ public abstract class BaseDecoder implements Runnable {
     protected abstract void onFrame(byte[] buf, int offset, int length);
     protected abstract void releaseDecoder();
 
-    public BaseDecoder(int videoWidth, int videoHeight) {
+    public VideoDecoder(int videoWidth, int videoHeight) {
         this.videoWidth = videoWidth;
         this.videoHeight = videoHeight;
     }

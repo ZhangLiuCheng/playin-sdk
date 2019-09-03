@@ -19,17 +19,20 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
     }
 
     private void playGame() {
-        String adId = "hSXyxiRK";
-        String appName = "Word Cookies!™";
-        String appIcon = "https://playinads.com/static/demo_app/f74e9808-5cd1-11e9-9c10-005056997473.jpg";
-        String appCover = "https://playinads.com/static/demo_app/f7659af8-5cd1-11e9-9c10-005056997473.jpg";
-        String appDownload = "https://play.google.com/store/apps/details?id=com.bitmango.go.wordcookies";
+        String adId = Constants.ADID;
+//        String appName = "Word Cookies!™";
+//        String appIcon = "https://playinads.com/static/demo_app/f74e9808-5cd1-11e9-9c10-005056997473.jpg";
+//        String appCover = "https://playinads.com/static/demo_app/f7659af8-5cd1-11e9-9c10-005056997473.jpg";
+//        String appDownload = "https://play.google.com/store/apps/details?id=com.bitmango.go.wordcookies";
         int playDuration = 120;
         int playTime = 2;
 
+//        PlayInView playView = findViewById(R.id.playView);
+//        playView.play(adId, appName, appIcon, appCover, appDownload,
+//                playDuration, playTime, this);
+
         PlayInView playView = findViewById(R.id.playView);
-        playView.play(adId, appName, appIcon, appCover, appDownload,
-                playDuration, playTime, this);
+        playView.play(adId, playDuration, playTime, this);
     }
 
     @Override

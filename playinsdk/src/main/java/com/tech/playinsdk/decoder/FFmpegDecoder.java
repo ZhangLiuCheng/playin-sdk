@@ -2,7 +2,7 @@ package com.tech.playinsdk.decoder;
 
 import android.view.Surface;
 
-public class FFmpegDecoder extends BaseDecoder {
+public class FFmpegDecoder extends VideoDecoder {
 
     static {
         System.loadLibrary("playin");

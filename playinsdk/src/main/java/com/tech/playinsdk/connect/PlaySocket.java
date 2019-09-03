@@ -16,7 +16,7 @@ public abstract class PlaySocket extends Thread {
 
     public abstract void onOpen();
     public abstract void onMessage(String msg);
-    public abstract void onMessage(byte[] buf);
+    public abstract void onMessage(int streamType, byte[] buf);
     public abstract void onError(Exception ex);
 
     private String ip;
@@ -113,8 +113,8 @@ public abstract class PlaySocket extends Thread {
                 }
 
                 @Override
-                public void buffer(byte[] buf) {
-                    onMessage(buf);
+                public void buffer(int streamType, byte[] buf) {
+                    onMessage(streamType, buf);
                 }
             });
         } catch (IOException ex) {

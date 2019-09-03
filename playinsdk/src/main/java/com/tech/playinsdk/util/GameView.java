@@ -7,15 +7,18 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import com.tech.playinsdk.connect.PlaySocket;
-import com.tech.playinsdk.decoder.BaseDecoder;
+import com.tech.playinsdk.decoder.AudioDecoder;
+import com.tech.playinsdk.decoder.VideoDecoder;
 import com.tech.playinsdk.decoder.FFmpegDecoder;
 import com.tech.playinsdk.model.entity.PlayInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 
-public class GameView extends SurfaceView implements SurfaceHolder.Callback, BaseDecoder.DecoderListener {
+
+public class GameView extends SurfaceView implements SurfaceHolder.Callback, VideoDecoder.DecoderListener {
 
     public interface GameListener {
         void onGameStart();
@@ -24,7 +27,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Bas
 
     private final StringBuilder controlBuilder = new StringBuilder();
 
-    private BaseDecoder decoder;
+    private VideoDecoder videodecoder;
+    private AudioDecoder audioDecoder;
 
     private GameListener playListener;
     private PlayInfo playInfo;
@@ -53,10 +57,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Bas
         playSocket = new MyPlaySocket(playInfo.getServerIp(), playInfo.getServerPort());
         playSocket.connect();
 
-        decoder = new FFmpegDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
-//        decoder = new MediaDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
-        decoder.setDecoderListener(this);
-        decoder.start(getHolder().getSurface());
+        audioDecoder = new AudioDecoder();
+        audioDecoder.start();
+
+        videodecoder = new FFmpegDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
+//        videodecoder = new MediaDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
+        videodecoder.setDecoderListener(this);
+        videodecoder.start(getHolder().getSurface());
     }
 
     @Override
@@ -67,8 +74,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Bas
             playSocket.disConnect();
         }
 
-        if (null != decoder) {
-            decoder.stop();
+        if (null != audioDecoder) {
+            audioDecoder.stop();
+        }
+        if (null != videodecoder) {
+            videodecoder.stop();
         }
     }
 
@@ -76,12 +86,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Bas
     protected void onWindowVisibilityChanged(int visibility) {
         super.onWindowVisibilityChanged(visibility);
         this.visibility = visibility;
+        PlayLog.e("onWindowVisibilityChanged  : " + visibility);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        if (null != decoder) {
-            decoder.setDisplayHolder(holder);
+        if (null != videodecoder) {
+            videodecoder.setDisplayHolder(holder);
         }
     }
 
@@ -90,8 +101,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Bas
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-//        if (null != decoder) {
-//            decoder.stop();
+//        if (null != videodecoder) {
+//            videodecoder.stop();
 //        }
     }
 
@@ -175,9 +186,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Bas
         }
 
         @Override
-        public void onMessage(byte[] buf) {
+        public void onMessage(int streamType, byte[] buf) {
             if (GameView.this.visibility == 0) {
-                decoder.sendVideoData(buf);
+                if (streamType == Constants.StreamType.H264) {
+                    videodecoder.sendVideoData(buf);
+                } else if (streamType == Constants.StreamType.PCM) {
+                    audioDecoder.sendAudioData(buf);
+                }
+//                PlayLog.e("onMessage --->  streamType:  " + streamType + "    " + Arrays.toString(buf));
             }
         }
 
