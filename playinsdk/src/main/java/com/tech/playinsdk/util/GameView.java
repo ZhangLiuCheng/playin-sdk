@@ -16,7 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-class GameView extends SurfaceView implements SurfaceHolder.Callback, BaseDecoder.DecoderListener {
+class PlayInteract extends SurfaceView implements SurfaceHolder.Callback, BaseDecoder.DecoderListener {
 
     public interface GameListener {
         void onGameStart();
@@ -32,12 +32,12 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback, BaseDecode
     private PlaySocket playSocket;
     private int visibility;
 
-    public GameView(Context context) {
+    public PlayInteract(Context context) {
         super(context);
         init();
     }
 
-    public GameView(Context context, AttributeSet attrs) {
+    public PlayInteract(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
@@ -157,9 +157,9 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback, BaseDecode
         public void onOpen() {
             PILog.v("MyPlaySocket --> onMessage  onOpen ");
             sendUserContect();
-//            if (playInfo.getOsType() == 2) {
+            if (playInfo.getOsType() == 2) {
                 sendMessageToAndroid();
-//            }
+            }
         }
 
         @Override
@@ -177,7 +177,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback, BaseDecode
 
         @Override
         public void onMessage(byte[] buf) {
-            if (GameView.this.visibility == 0) {
+            if (PlayInteract.this.visibility == 0) {
                 decoder.sendVideoData(buf);
             }
         }
