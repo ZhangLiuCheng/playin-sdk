@@ -8,41 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-
-    <!-- 试玩过程中  倒计时和logo -->
     <RelativeLayout
-        android:id="@+id/playingView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/countDownTv"
-            android:layout_width="33dp"
-            android:layout_height="33dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/playin_time"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/adLogoTv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="10dp"
-            android:text="PlayIn Ads"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="italic|bold" />
-    </RelativeLayout>
-
-    <!-- 试玩结束 下载 -->
-    <RelativeLayout
-        android:id="@+id/finishView"
+        android:id="@+id/appInfoView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#88000000"
@@ -56,9 +23,9 @@
             android:layout_marginRight="10dp"
             android:background="@drawable/playin_bg_info"
             android:orientation="vertical"
-            android:paddingLeft="30dp"
+            android:paddingLeft="20dp"
             android:paddingTop="20dp"
-            android:paddingRight="30dp"
+            android:paddingRight="20dp"
             android:paddingBottom="10dp">
 
             <LinearLayout
@@ -79,19 +46,19 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/appName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:lines="1"
-                        android:text="游戏名称"
                         android:textColor="#000000"
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/appAudience"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:text="适合所有人"
                         android:textColor="#888888"
                         android:textSize="12sp" />
 
@@ -107,6 +74,7 @@
                             android:src="@drawable/playin_star" />
 
                         <TextView
+                            android:id="@+id/appRate"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="3dp"
@@ -120,18 +88,19 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:paddingLeft="2dp"
-                            android:text="| 23234下载"
+                            android:text="| 23234"
                             android:textColor="#888888"
                             android:textSize="12sp" />
 
                         <TextView
-                            android:layout_width="70dp"
-                            android:layout_height="25dp"
+                            android:id="@+id/downloadTv"
+                            android:layout_width="80dp"
+                            android:layout_height="30dp"
                             android:background="@drawable/playin_btn_install"
                             android:gravity="center"
-                            android:text="立即下载"
+                            android:text="install"
                             android:textColor="#FFFFFF"
-                            android:textSize="10sp" />
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -163,6 +132,65 @@
                     android:textColor="#888888"
                     android:textSize="14sp" />
             </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+
+    <!--  countdown close  menu-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/countDownTv"
+            android:layout_width="33dp"
+            android:layout_height="33dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/playin_time"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/closeIv"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/playin_btn_close"
+            android:padding="7dp"
+            android:src="@drawable/playin_close"
+            android:visibility="gone" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:text="PlayIn Ads"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="italic|bold" />
+
+        <LinearLayout
+            android:id="@+id/menuLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="100dp"
+            android:background="@drawable/playin_bg_menu"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/playin_menu" />
         </LinearLayout>
     </RelativeLayout>
 </FrameLayout>

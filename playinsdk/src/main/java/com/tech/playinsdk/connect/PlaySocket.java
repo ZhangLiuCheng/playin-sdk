@@ -44,15 +44,15 @@ public abstract class PlaySocket extends Thread {
     }
 
     public void disConnect() {
-        interrupt();
         try {
+            interrupt();
             if (null != socket) {
                 socket.shutdownOutput();
                 socket.shutdownInput();
                 socket.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         Common.closeStream(istream, ostream);
     }

@@ -71,7 +71,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         if (null != playSocket) {
             playSocket.disConnect();
         }
-
         if (null != audioDecoder) {
             audioDecoder.stop();
         }
@@ -174,8 +173,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
             PlayLog.v("MyPlaySocket --> onMessage  msg " + msg);
             try {
                 JSONObject object = new JSONObject(msg);
-                if (0 != object.optInt("code") && null != playListener) {
-                    playListener.onGameError(new Exception(object.optString("onPlayError")));
+                if (0 != object.optInt("code")) {
+                    invokeGameError(new Exception(object.optString("onPlayError")));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -196,14 +195,34 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         @Override
         public void onError(Exception ex) {
             PlayLog.v("MyPlaySocket --> onError  " + ex);
-            if (null != playListener) {
-                playListener.onGameError(ex);
-            }
+            invokeGameError(ex);
         }
     }
 
     @Override
     public void decoderSuccess() {
-        playListener.onGameStart();
+        invokeGameStart();
+    }
+
+    private void invokeGameStart() {
+        getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                if (null != playListener) {
+                    playListener.onGameStart();
+                }
+            }
+        });
+    }
+
+    private void invokeGameError(final Exception ex) {
+        getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                if (null != playListener) {
+                    playListener.onGameError(ex);
+                }
+            }
+        });
     }
 }

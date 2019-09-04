@@ -5,6 +5,9 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 
+import com.tech.playinsdk.util.PlayLog;
+
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -47,6 +50,7 @@ public class AudioDecoder implements Runnable {
         while (initCodec) {
             try {
                 byte[] buf = audioQueue.take();
+                PlayLog.e("音频数据: " + Arrays.toString(buf));
                 this.audioTrack.write(buf, 0, buf.length);
             } catch (Exception e) {
                 e.printStackTrace();

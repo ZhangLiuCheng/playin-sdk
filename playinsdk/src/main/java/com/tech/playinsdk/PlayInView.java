@@ -29,12 +29,12 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
     private int playDuration;
     private int countDuration;
+    private boolean isDetached;
+    private boolean isFinish, isDownload;
 
     private GameView gameView;
-    private View playingView;
-    private View finishView;
+    private View appInfoView;
 
-    private boolean isDetachedFromWindow;
 
     public PlayInView(Context context) {
         super(context);
@@ -49,14 +49,13 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        isDetachedFromWindow = true;
+        isDetached = true;
         getHandler().removeCallbacksAndMessages(null);
         reportPlayEnd();
     }
 
     /**
      * playGame
-     *
      * @param adid
      * @param playDuration
      * @param listener
@@ -70,44 +69,38 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private void initGameView() {
         LayoutInflater.from(getContext()).inflate(R.layout.playin_view, this);
         gameView = findViewById(R.id.gameview);
-        playingView = findViewById(R.id.playingView);
-        finishView = findViewById(R.id.finishView);
-        finishView.setOnClickListener(this);
+        appInfoView = findViewById(R.id.appInfoView);
+        appInfoView.setOnClickListener(this);
+        findViewById(R.id.closeIv).setOnClickListener(this);
+        findViewById(R.id.downloadTv).setOnClickListener(this);
+        findViewById(R.id.menuLayout).setOnClickListener(this);
     }
 
     @Override
     public void onGameStart() {
-        this.playListener.onPlaystart();
-        getHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                startCount();
-            }
-        });
+        playListener.onPlaystart();
+        startCount();
     }
 
     @Override
-    public void onGameError(Exception ex) {
-        this.playListener.onPlayError(ex);
-        getHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                showError();
-            }
-        });
+    public void onGameError(final Exception ex) {
+        showPlayFinish();
+        if (!isFinish && !isDownload) {
+            playListener.onPlayError(ex);
+        }
     }
 
     @Override
     public void onClick(View v) {
-        String tag = (String) v.getTag();
-        if ("close".equals(tag)) {
+        int cId = v.getId();
+        if (cId == R.id.closeIv) {
             playListener.onPlayClose();
-        } else if ("install".equals(tag)) {
+        } else if (cId == R.id.downloadTv) {
             goDownload();
-        }
-
-        if (v.getId() == R.id.finishView) {
-            finishView.setVisibility(GONE);
+        } else if (cId == R.id.appInfoView) {
+            hidMenuInfo();
+        } else if (cId == R.id.menuLayout) {
+            showMenuInfo();
         }
     }
 
@@ -115,7 +108,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         PlayInSdk.getInstance().userActions(adid, new HttpListener<PlayInfo>() {
             @Override
             public void success(PlayInfo result) {
-                if (isDetachedFromWindow) return;
+                if (isDetached) return;
                 initData(result);
                 playInfo = result;
                 countDuration = Math.min(playDuration, result.getDuration());
@@ -130,8 +123,17 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void initData(PlayInfo playInfo) {
+        TextView appNameTv = findViewById(R.id.appName);
+        TextView appAudienceTv = findViewById(R.id.appAudience);
+        TextView appRateTv = findViewById(R.id.appRate);
+        TextView downloadTv = findViewById(R.id.downloadTv);
+        appNameTv.setText(playInfo.getAppName());
+        appAudienceTv.setText(String.valueOf(playInfo.getAudience()));
+        appRateTv.setText(String.valueOf(playInfo.getAppRate()));
+//        downloadTv.setText(playInfo.getInstallText());
+
         final ImageView appIcon = findViewById(R.id.appIcon);
-        HttpHelper.obtian().getHttpBitmap("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1567520583167&di=63d09991b1d38d15bc100be6f6b81b1d&imgtype=0&src=http%3A%2F%2Fpic39.nipic.com%2F20140321%2F18063302_210604412116_2.jpg", new HttpListener<Bitmap>() {
+        HttpHelper.obtian().getHttpBitmap(playInfo.getAppIcon(), new HttpListener<Bitmap>() {
             @Override
             public void success(Bitmap result) {
                 appIcon.setImageBitmap(result);
@@ -148,18 +150,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private void goDownload() {
         reportDownload();
         String downloadUrl = playInfo.getGoogleplayUrl();
-        if (TextUtils.isEmpty(downloadUrl) || "null".equals(downloadUrl)) {
-            Toast.makeText(getContext(), "There is no googlePlay download url", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        try {
-            Uri uri = Uri.parse(downloadUrl);
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            getContext().startActivity(intent);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PlayLog.e("download app error：" + ex);
-        }
+        playListener.onPlayDownload(downloadUrl);
     }
 
     private void startCount() {
@@ -181,24 +172,34 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void showPlayFinish() {
-        playingView.setVisibility(GONE);
-        finishView.setVisibility(VISIBLE);
+        findViewById(R.id.closeIv).setVisibility(VISIBLE);          // 显示关闭按钮
+        findViewById(R.id.countDownTv).setVisibility(GONE);         // 隐藏倒计时
+        findViewById(R.id.menuLayout).setVisibility(GONE);          // 隐藏menu
+        appInfoView.setVisibility(VISIBLE);                         // 显示下载弹窗
+        appInfoView.setOnClickListener(null);
     }
 
-    private void showError() {
-        playingView.setVisibility(GONE);
-        finishView.setVisibility(VISIBLE);
+    private void showMenuInfo() {
+        appInfoView.setVisibility(VISIBLE);                         // 显示下载弹窗
+        findViewById(R.id.menuLayout).setVisibility(GONE);          // 隐藏menu
     }
+
+    private void hidMenuInfo() {
+        appInfoView.setVisibility(GONE);
+        findViewById(R.id.menuLayout).setVisibility(VISIBLE);
+    }
+
 
     private void reportDownload() {
+        isDownload = true;
         if (null != playInfo && !TextUtils.isEmpty(playInfo.getToken())) {
             PlayInSdk.getInstance().report(playInfo.getToken(), Constants.Report.DOWN_LOAD);
         }
     }
 
     private void reportPlayEnd() {
-        PlayLog.e("reportPlayEnd");
-        if (/*leftTime <= 1 && */null != playInfo && !TextUtils.isEmpty(playInfo.getToken())) {
+        isFinish = true;
+        if (null != playInfo && !TextUtils.isEmpty(playInfo.getToken())) {
             PlayInSdk.getInstance().report(playInfo.getToken(), Constants.Report.END_PLAY);
         }
     }
@@ -298,7 +299,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         Context context = getContext();
         RelativeLayout rLayout = new RelativeLayout(context);
         rLayout.setVisibility(GONE);        // 默认隐藏
-        finishView = rLayout;
+        appInfoView = rLayout;
 
         rLayout.setClickable(true);
         rLayout.setBackgroundColor(Color.parseColor("#88000000"));
