@@ -11,15 +11,15 @@ public abstract class VideoDecoder implements Runnable {
     public interface DecoderListener {
         void decoderSuccess();
     }
+    private DecoderListener decoderListener;
 
     private BlockingQueue<byte[]> videoQueue = new LinkedBlockingQueue<>(30);
-
     private int videoWidth;
     private int videoHeight;
 
+    private boolean loopFlag;
     private boolean initCodec;
     private boolean decodeSuccess;
-    private DecoderListener decoderListener;
 
     protected abstract boolean initDecoder(int videoWidth, int videoHeight, Surface surface);
     protected abstract void onFrame(byte[] buf, int offset, int length);
@@ -36,10 +36,10 @@ public abstract class VideoDecoder implements Runnable {
 
     @Override
     public void run() {
-        while (initCodec) {
+        while (loopFlag) {
             try {
                 byte[] buf = videoQueue.take();
-                onFrame(buf, 0, buf.length);
+                if (initCodec) onFrame(buf, 0, buf.length);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -47,7 +47,9 @@ public abstract class VideoDecoder implements Runnable {
     }
 
     public synchronized void setDisplayHolder(SurfaceHolder holder) {
-        initDecoder(this.videoWidth, this.videoHeight, holder.getSurface());
+        if (initDecoder(this.videoWidth, this.videoHeight, holder.getSurface())) {
+            initCodec = true;
+        }
     }
 
     public void sendVideoData(byte[] buf) {
@@ -56,15 +58,15 @@ public abstract class VideoDecoder implements Runnable {
         }
     }
 
-    public synchronized void start(Surface surface) {
-        if (initDecoder(this.videoWidth, this.videoHeight, surface)) {
-            initCodec = true;
-            new Thread(this).start();
-        }
+    public synchronized void start() {
+        videoQueue.clear();
+        loopFlag = true;
+        new Thread(this).start();
     }
 
     public synchronized void stop() {
         videoQueue.clear();
+        loopFlag = false;
         initCodec = false;
         decodeSuccess = false;
         releaseDecoder();

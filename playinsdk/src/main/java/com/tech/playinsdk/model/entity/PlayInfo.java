@@ -27,6 +27,8 @@ public class PlayInfo {
     private String appIcon;
     private int appRate;
     private int commentsCount;
+    private int downloadsCount;
+    private String copywriting;
 
     public String getToken() {
         return token;
@@ -205,6 +207,22 @@ public class PlayInfo {
         this.commentsCount = commentsCount;
     }
 
+    public int getDownloadsCount() {
+        return downloadsCount;
+    }
+
+    public void setDownloadsCount(int downloadsCount) {
+        this.downloadsCount = downloadsCount;
+    }
+
+    public String getCopywriting() {
+        return copywriting;
+    }
+
+    public void setCopywriting(String copywriting) {
+        this.copywriting = copywriting;
+    }
+
     public static PlayInfo jsonToPlayInfo(JSONObject obj) {
         PlayInfo playInfo = new PlayInfo();
         playInfo.setServerIp(obj.optString("stream_server_ip"));
@@ -227,6 +245,8 @@ public class PlayInfo {
         playInfo.setAppIcon(obj.optString("icon_url"));
         playInfo.setAppRate(obj.optInt("app_rate"));
         playInfo.setCommentsCount(obj.optInt("comments_count"));
+        playInfo.setDownloadsCount(obj.optInt("downloads"));
+        playInfo.setCopywriting(obj.optString("copywriting"));
 
         return playInfo;
     }

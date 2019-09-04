@@ -8,6 +8,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import com.tech.playinsdk.connect.PlaySocket;
 import com.tech.playinsdk.decoder.AudioDecoder;
+import com.tech.playinsdk.decoder.MediaDecoder;
 import com.tech.playinsdk.decoder.VideoDecoder;
 import com.tech.playinsdk.decoder.FFmpegDecoder;
 import com.tech.playinsdk.model.entity.PlayInfo;
@@ -61,7 +62,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         videodecoder = new FFmpegDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
 //        videodecoder = new MediaDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
         videodecoder.setDecoderListener(this);
-        videodecoder.start(getHolder().getSurface());
+        videodecoder.start();
     }
 
     @Override
@@ -93,13 +94,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) { }
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-//        if (null != videodecoder) {
-//            videodecoder.stop();
-//        }
     }
 
     @Override

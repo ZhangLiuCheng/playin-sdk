@@ -26,7 +26,7 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
 
     private void playGame() {
         PlayInView playView = findViewById(R.id.playView);
-        playView.play(Constants.ADID, 23, this);
+        playView.play(Constants.ADID, 120, this);
     }
 
     @Override

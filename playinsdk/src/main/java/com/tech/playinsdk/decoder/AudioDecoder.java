@@ -50,7 +50,7 @@ public class AudioDecoder implements Runnable {
         while (initCodec) {
             try {
                 byte[] buf = audioQueue.take();
-                PlayLog.e("音频数据: " + Arrays.toString(buf));
+//                PlayLog.e("音频数据: " + Arrays.toString(buf));
                 this.audioTrack.write(buf, 0, buf.length);
             } catch (Exception e) {
                 e.printStackTrace();
