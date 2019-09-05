@@ -54,6 +54,9 @@ public abstract class PlaySocket extends Thread {
         } catch (Exception e) {
 //            e.printStackTrace();
         }
+        if (null != mWriteThread) {
+            mWriteThread.interrupt();
+        }
         Common.closeStream(istream, ostream);
     }
 

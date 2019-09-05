@@ -2,15 +2,16 @@ package com.tech.playinsdk.util;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
 import com.tech.playinsdk.connect.PlaySocket;
 import com.tech.playinsdk.decoder.AudioDecoder;
-import com.tech.playinsdk.decoder.MediaDecoder;
-import com.tech.playinsdk.decoder.VideoDecoder;
 import com.tech.playinsdk.decoder.FFmpegDecoder;
+import com.tech.playinsdk.decoder.VideoDecoder;
 import com.tech.playinsdk.model.entity.PlayInfo;
 
 import org.json.JSONException;
@@ -24,6 +25,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         void onGameError(Exception ex);
     }
 
+    private final Handler handler = new Handler();
     private final StringBuilder controlBuilder = new StringBuilder();
 
     private VideoDecoder videodecoder;
@@ -58,7 +60,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
         audioDecoder = new AudioDecoder();
         audioDecoder.start();
-
+//
         videodecoder = new FFmpegDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
 //        videodecoder = new MediaDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
         videodecoder.setDecoderListener(this);
@@ -78,6 +80,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         if (null != videodecoder) {
             videodecoder.stop();
         }
+        handler.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -204,7 +207,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     }
 
     private void invokeGameStart() {
-        getHandler().post(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 if (null != playListener) {
@@ -215,7 +218,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     }
 
     private void invokeGameError(final Exception ex) {
-        getHandler().post(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 if (null != playListener) {

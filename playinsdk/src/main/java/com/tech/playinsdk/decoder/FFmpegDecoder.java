@@ -32,6 +32,6 @@ public class FFmpegDecoder extends VideoDecoder {
 
     @Override
     protected void releaseDecoder() {
-//        ffmpegClose();
+        ffmpegClose();
     }
 }

@@ -5,6 +5,7 @@ import android.view.SurfaceHolder;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public abstract class VideoDecoder implements Runnable {
 
@@ -38,7 +39,7 @@ public abstract class VideoDecoder implements Runnable {
     public void run() {
         while (loopFlag) {
             try {
-                byte[] buf = videoQueue.take();
+                byte[] buf = videoQueue.poll(500, TimeUnit.MILLISECONDS);
                 if (initCodec) onFrame(buf, 0, buf.length);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -66,6 +67,7 @@ public abstract class VideoDecoder implements Runnable {
 
     public synchronized void stop() {
         videoQueue.clear();
+        videoQueue = null;
         loopFlag = false;
         initCodec = false;
         decodeSuccess = false;
