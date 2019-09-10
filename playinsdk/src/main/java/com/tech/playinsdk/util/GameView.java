@@ -87,6 +87,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     protected void onWindowVisibilityChanged(int visibility) {
         super.onWindowVisibilityChanged(visibility);
         this.visibility = visibility;
+        if (null != videodecoder) {
+            if (visibility == 0) {
+                videodecoder.resume();
+            } else {
+                videodecoder.pause();
+            }
+        }
     }
 
     @Override
