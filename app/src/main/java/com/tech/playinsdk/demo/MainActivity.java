@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         initData();
+
+        PlayInSdk.getInstance().setTest(true);
     }
 
     private void initData() {

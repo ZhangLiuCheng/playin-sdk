@@ -8,6 +8,7 @@ import com.tech.playinsdk.model.ApiService;
 import com.tech.playinsdk.model.entity.Advert;
 import com.tech.playinsdk.model.entity.Config;
 import com.tech.playinsdk.model.entity.PlayInfo;
+import com.tech.playinsdk.util.Constants;
 import com.tech.playinsdk.util.PlayLog;
 
 import java.util.List;
@@ -21,10 +22,6 @@ public class PlayInSdk {
 
     private String sdkKey;
     private Config configData;
-
-    public void setDebug(boolean debug) {
-        PlayLog.DEBUG = debug;
-    }
 
     public String getApiHost() {
         if (null != configData) {
@@ -113,5 +110,15 @@ public class PlayInSdk {
 
     private void setHttpHelperSessionKey(String sessionKey) {
         HttpHelper.obtian().setSessionKey(sessionKey);
+    }
+
+    public PlayInSdk setLog(boolean flag) {
+        PlayLog.DEBUG = flag;
+        return this;
+    }
+
+    public PlayInSdk setTest(boolean flag) {
+        Constants.TEST = flag;
+        return this;
     }
 }
