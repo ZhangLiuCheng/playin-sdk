@@ -15,10 +15,15 @@
         android:background="#88000000"
         android:visibility="gone">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:rotation="90">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@drawable/playin_bg_info"
@@ -26,8 +31,7 @@
             android:paddingLeft="20dp"
             android:paddingTop="20dp"
             android:paddingRight="20dp"
-            android:paddingBottom="10dp"
-            android:rotation="90">
+            android:paddingBottom="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -149,6 +153,18 @@
                     android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
+
+            <ImageView
+                android:id="@+id/closeDiaogIv"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/playin_btn_close"
+                android:padding="7dp"
+                android:src="@drawable/playin_close" />
+        </RelativeLayout>
     </RelativeLayout>
 
 
@@ -157,31 +173,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/countDownTv"
-            android:layout_width="33dp"
-            android:layout_height="33dp"
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
-            android:background="@drawable/playin_time"
-            android:gravity="center"
-            android:rotation="90"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp" />
+            android:rotation="90">
 
-        <ImageView
-            android:id="@+id/closeIv"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/playin_btn_close"
-            android:padding="7dp"
-            android:rotation="90"
-            android:src="@drawable/playin_close"
-            android:visibility="gone" />
+            <TextView
+                android:id="@+id/countDownTv"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:background="@drawable/playin_time"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/closeIv"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/playin_btn_close"
+                android:padding="7dp"
+                android:src="@drawable/playin_close"
+                android:visibility="gone" />
+        </FrameLayout>
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -192,7 +210,7 @@
             android:text="PlayIn Ads"
             android:textColor="#FFFFFF"
             android:layout_marginLeft="-18dp"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:textStyle="italic" />
 
         <View

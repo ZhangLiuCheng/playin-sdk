@@ -111,7 +111,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
     private void initView(PlayInfo playInfo) {
 //        playInfo.setOrientation(1);
-//        playInfo.setDuration(20);
+//        playInfo.setDuration(5);
 
         View rootView;
         if (playInfo.getOrientation() == 0) {
@@ -177,7 +177,6 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
                     getHandler().postDelayed(this, 1000);
                 } else {
                     showPlayFinish();
-                    reportPlayEnd();
                 }
             }
         }, 1000);
@@ -205,6 +204,8 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
                     }
                     progressView.setLayoutParams(params);
                     getHandler().postDelayed(this, 1000);
+                } else {
+                    reportPlayEnd();
                 }
             }
         }, 1000);
@@ -215,17 +216,23 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         findViewById(R.id.countDownTv).setVisibility(GONE);         // 隐藏倒计时
         findViewById(R.id.menuLayout).setVisibility(GONE);          // 隐藏menu
         appInfoView.setVisibility(VISIBLE);                         // 显示下载弹窗
-        appInfoView.setOnClickListener(null);
+        // 时间到不让关闭弹窗
+        if (isFinish) {
+            appInfoView.setOnClickListener(null);
+            findViewById(R.id.closeDiaogIv).setVisibility(GONE);
+        }
     }
 
     private void showMenuInfo() {
         appInfoView.setVisibility(VISIBLE);                         // 显示下载弹窗
         findViewById(R.id.menuLayout).setVisibility(GONE);          // 隐藏menu
+        ((View) findViewById(R.id.closeIv).getParent()).setVisibility(GONE);
     }
 
     private void hidMenuInfo() {
         appInfoView.setVisibility(GONE);
         findViewById(R.id.menuLayout).setVisibility(VISIBLE);
+        ((View) findViewById(R.id.closeIv).getParent()).setVisibility(VISIBLE);
     }
 
 
