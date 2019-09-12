@@ -95,8 +95,16 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         if (!isFinish && !isDownload) {
             playListener.onPlayError(ex);
         }
-        reportPlayEnd();
-        showPlayFinish();
+        try {
+            reportPlayEnd();
+            showPlayFinish();
+            // 异常
+            getHandler().removeCallbacksAndMessages(null);
+            totalTimeTv.setVisibility(GONE);
+            videoTimeTv.setText("关闭");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -221,7 +229,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     // 激励视频倒计时
     private void countVideoTime() {
         if (videoTime <= 0) {
-            videoTimeTv.setText(" | 关闭");
+            videoTimeTv.setText("关闭");
             videoTimeTv.setOnClickListener(this);
             return;
         }
