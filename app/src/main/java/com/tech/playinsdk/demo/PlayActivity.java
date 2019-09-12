@@ -62,6 +62,11 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
         }
     }
 
+    @Override
+    public void onPlayForceTime() {
+        PlayLog.e("强制试玩时间结束");
+    }
+
     private void hideLoading() {
         runOnUiThread(new Runnable() {
             @Override

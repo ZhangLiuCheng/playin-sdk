@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!--  dialog  -->
     <RelativeLayout
         android:id="@+id/appInfoView"
         android:layout_width="match_parent"
@@ -15,10 +16,11 @@
         android:background="#88000000"
         android:visibility="gone">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -122,6 +124,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- line -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1px"
@@ -149,88 +152,74 @@
                         android:textColor="#888888"
                         android:textSize="14sp" />
                 </LinearLayout>
+
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/closeDiaogIv"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/playin_btn_close"
-                android:padding="7dp"
-                android:src="@drawable/playin_close" />
-        </RelativeLayout>
+            <TextView
+                android:id="@+id/continueTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="40dp"
+                android:layout_gravity="center_horizontal"
+                android:textSize="16sp"
+                android:text="tap to continue"/>
 
+        </LinearLayout>
     </RelativeLayout>
 
-
-    <!--  countdown close  menu -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp">
-        <TextView
-            android:id="@+id/countDownTv"
-            android:layout_width="33dp"
-            android:layout_height="33dp"
-
-            android:background="@drawable/playin_time"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp" />
-
-        <ImageView
-            android:id="@+id/closeIv"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/playin_btn_close"
-            android:padding="7dp"
-            android:src="@drawable/playin_close"
-            android:visibility="gone" />
-        </FrameLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="5dp"
-            android:text="PlayIn Ads"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:textStyle="italic" />
-
+        <!--    time    -->
         <LinearLayout
-            android:id="@+id/menuLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="100dp"
-            android:background="@drawable/playin_bg_menu"
-            android:orientation="horizontal"
-            android:padding="10dp">
+            android:background="@drawable/playin_btn_close"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
 
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/playin_menu" />
+
+            <TextView
+                android:id="@+id/totlalTimeTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/videoTimeTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
         </LinearLayout>
 
-        <View
-            android:id="@+id/progressView"
-            android:layout_width="0dp"
-            android:layout_height="4dp"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/playin_progress_port" />
+        <!--    menu    -->
+        <LinearLayout
+            android:id="@+id/menuLayout"
+            android:layout_width="30dp"
+            android:layout_height="120dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="right"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="8dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/playin_bg_menu" />
+
+        </LinearLayout>
 
     </RelativeLayout>
 </FrameLayout>
