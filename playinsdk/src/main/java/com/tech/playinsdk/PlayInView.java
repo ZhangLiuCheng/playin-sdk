@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
@@ -131,7 +132,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void initView(PlayInfo playInfo) {
-        playInfo.setOrientation(1);
+//        playInfo.setOrientation(1);
 //        playInfo.setDuration(5);
 
         View rootView;
@@ -151,6 +152,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void initData(PlayInfo playInfo) {
+        adapterLandscape();
         TextView appNameTv = findViewById(R.id.appName);
         TextView appAudienceTv = findViewById(R.id.appAudience);
         TextView appRateTv = findViewById(R.id.appRate);
@@ -174,6 +176,17 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
                 PlayLog.e("获取APP Icon图片失败:  " + e);
             }
         });
+    }
+
+    private void adapterLandscape() {
+        if (playInfo.getOrientation() == 1) {
+            View fixBug = findViewById(R.id.fixbug);
+            if (fixBug != null) fixBug.setVisibility(VISIBLE);
+
+            View appView = findViewById(R.id.appView);
+            appView.setRotation(90);
+            appView.setTranslationY(-TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 70, getResources().getDisplayMetrics()));
+        }
     }
 
     private void connectPlayIn(PlayInfo playInfo) {

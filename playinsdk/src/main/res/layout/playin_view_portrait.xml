@@ -25,11 +25,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="20dp"
                 android:background="@drawable/playin_bg_info"
                 android:orientation="vertical"
-                android:paddingLeft="20dp"
+                android:paddingLeft="30dp"
                 android:paddingTop="20dp"
                 android:paddingRight="20dp"
                 android:paddingBottom="10dp">
@@ -207,12 +206,13 @@
         <LinearLayout
             android:id="@+id/menuLayout"
             android:layout_width="30dp"
-            android:layout_height="120dp"
+            android:layout_height="160dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:gravity="right"
             android:visibility="gone"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="50dp">
 
             <ImageView
                 android:layout_width="8dp"
