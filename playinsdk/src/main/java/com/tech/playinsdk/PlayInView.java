@@ -219,12 +219,12 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private Runnable videoTimeRunnable = new Runnable() {
         @Override
         public void run() {
-            videoTimeTv.setText("可在（" + videoTime + "）后关闭");
+            videoTimeTv.setText("Skip Ads ( " + videoTime + " )");
             videoTime--;
             if (videoTime >= 0) {
                 getHandler().postDelayed(this, 1000);
             } else {
-                videoTimeTv.setText("关闭");
+                videoTimeTv.setText("Skip Ads");
                 videoTimeTv.setOnClickListener(PlayInView.this);
                 findViewById(R.id.menuLayout).setVisibility(VISIBLE);
                 playListener.onPlayForceTime();
@@ -235,11 +235,11 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     // 激励视频倒计时
     private void countVideoTime() {
         if (videoTime <= 0) {
-            videoTimeTv.setText("关闭");
+            videoTimeTv.setText("Skip Ads");
             videoTimeTv.setOnClickListener(this);
             return;
         }
-        videoTimeTv.setText("可在（" + videoTime + "）后关闭");
+        videoTimeTv.setText("Skip Ads ( " + videoTime + " )");
         getHandler().postDelayed(videoTimeRunnable, 1000);
     }
 
