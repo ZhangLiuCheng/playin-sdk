@@ -144,11 +144,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     }
 
 
-    private void sendMessageToAndroid() {
-        playSocket.sendStream(Constants.PacketType.STREAM, Constants.StreamType.ANDROID_VIDEO_START, "");
-    }
-
-
     private void sendUserContect() {
         try {
             JSONObject obj = new JSONObject();
@@ -162,6 +157,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         }
     }
 
+    private void sendMessageToAndroid() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                    playSocket.sendStream(Constants.PacketType.STREAM, Constants.StreamType.ANDROID_VIDEO_START, "");
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
     private class MyPlaySocket extends PlaySocket {
 
         public MyPlaySocket(String ip, int port) {
@@ -170,11 +180,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
         @Override
         public void onOpen() {
-            PlayLog.v("MyPlaySocket --> onMessage  onOpen ");
+            PlayLog.v("MyPlaySocket --> onMessage  onOpen " + playInfo.getOsType());
             sendUserContect();
-            if (playInfo.getOsType() == 2) {
+//            if (playInfo.getOsType() == 2) {
                 sendMessageToAndroid();
-            }
+//            }
         }
 
         @Override

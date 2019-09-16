@@ -247,6 +247,7 @@ public class PlayInfo {
         playInfo.setCommentsCount(obj.optInt("comments_count"));
         playInfo.setDownloadsCount(obj.optInt("downloads"));
         playInfo.setCopywriting(obj.optString("copywriting"));
+        playInfo.setOsType(obj.optInt("os_type"));
 
         return playInfo;
     }

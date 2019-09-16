@@ -102,7 +102,8 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             // 异常
             getHandler().removeCallbacksAndMessages(null);
             totalTimeTv.setVisibility(GONE);
-            videoTimeTv.setText("关闭");
+            videoTimeTv.setText("Skip Ads");
+            videoTimeTv.setOnClickListener(PlayInView.this);
         } catch (Exception e) {
             e.printStackTrace();
         }
