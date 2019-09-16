@@ -78,6 +78,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
      * @param listener
      */
     public void play(String adid, int playDuration, final PlayListener listener) {
+//        playDuration = 5;
         this.videoTime = playDuration;
         this.playListener = listener;
         this.requestPlayInfo(adid);
@@ -141,7 +142,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
     private void initView(PlayInfo playInfo) {
 //        playInfo.setOrientation(1);
-//        playInfo.setDuration(5);
+//        playInfo.setDuration(10);
 
         View rootView;
         if (playInfo.getOrientation() == 0) {
@@ -157,6 +158,11 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
         findViewById(R.id.downloadTv).setOnClickListener(this);
         findViewById(R.id.menuLayout).setOnClickListener(this);
+
+
+        Animation anim = AnimationUtils.loadAnimation(getContext(), R.anim.playin_menu);
+        ImageView menuIv = findViewById(R.id.menuIv);
+        menuIv.startAnimation(anim);
     }
 
     private void initData(PlayInfo playInfo) {
@@ -215,7 +221,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         public void run() {
             videoTimeTv.setText("可在（" + videoTime + "）后关闭");
             videoTime--;
-            if (videoTime > 0) {
+            if (videoTime >= 0) {
                 getHandler().postDelayed(this, 1000);
             } else {
                 videoTimeTv.setText("关闭");
@@ -245,7 +251,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             public void run() {
                 totalTimeTv.setText(totalTime + "s | ");
                 totalTime--;
-                if (totalTime > 0) {
+                if (totalTime >= 0) {
                     getHandler().postDelayed(this, 1000);
                 } else {
                     totalTimeTv.setVisibility(GONE);

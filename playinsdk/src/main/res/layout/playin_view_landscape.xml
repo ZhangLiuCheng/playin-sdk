@@ -192,10 +192,7 @@
                 android:layout_alignParentRight="true"
                 android:background="@drawable/playin_btn_close"
                 android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp">
-
+                android:paddingRight="8dp">
 
                 <TextView
                     android:id="@+id/totlalTimeTv"
@@ -203,7 +200,9 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="#FFFFFF"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"/>
 
                 <TextView
                     android:id="@+id/videoTimeTv"
@@ -211,7 +210,9 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="#FFFFFF"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"/>
             </LinearLayout>
 
         </RelativeLayout>
@@ -231,6 +232,7 @@
             android:rotation="90">
 
             <ImageView
+                android:id="@+id/menuIv"
                 android:layout_width="8dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/playin_bg_menu" />
