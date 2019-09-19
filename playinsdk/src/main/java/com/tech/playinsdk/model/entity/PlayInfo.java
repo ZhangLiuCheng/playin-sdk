@@ -20,7 +20,7 @@ public class PlayInfo {
     private String webviewDevUrl;
     private int deviceWidth;
     private int deviceHeight;
-    private int osType;
+    private int osType;             // 1 ios， 2 android
 
     private String audience;
     private String appName;

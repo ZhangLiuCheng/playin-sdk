@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         initData();
 
-        PlayInSdk.getInstance().setTest(true);
+//        PlayInSdk.getInstance().setTest(true);
     }
 
     private void initData() {

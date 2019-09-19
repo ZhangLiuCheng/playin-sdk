@@ -60,8 +60,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
         audioDecoder = new AudioDecoder();
         audioDecoder.start();
-//
-        videodecoder = new FFmpegDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
+
+        int width = playInfo.getDeviceWidth();
+        int height = playInfo.getDeviceHeight();
+
+        if (playInfo.getOsType() == 2 && playInfo.getOrientation() == 1) {
+            // android 设备端 并且是 横屏
+            width = playInfo.getDeviceHeight();
+            height = playInfo.getDeviceWidth();
+        }
+
+        videodecoder = new FFmpegDecoder(width, height);
 //        videodecoder = new MediaDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
         videodecoder.setDecoderListener(this);
         videodecoder.start();

@@ -10,12 +10,20 @@ public class Constants {
 
     public static boolean TEST = false;
 
-    public static String getHOST() {
+    public static String getHost() {
         if (TEST) {
             return HOST_OFFLINE;
         }
         return HOST_ONLINE;
     }
+
+    public static String getConfigHost() {
+        if (TEST) {
+            return HOST_OFFLINE + "/config?device_name=test";
+        }
+        return HOST_ONLINE + "/config";
+    }
+
 
     public final static class Report {
         public final static String DOWN_LOAD = "AppStore";
