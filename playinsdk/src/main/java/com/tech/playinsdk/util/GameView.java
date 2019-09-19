@@ -124,6 +124,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     public boolean onTouchEvent(MotionEvent event) {
         float rateWidth = event.getX() / getWidth();
         float rateHeight = event.getY() / getHeight();
+
         int action = event.getAction();  // 0 down, 1 up, 2 move
         // 目标触摸 0-down,1-move,2-up
         if (action == 1) {
