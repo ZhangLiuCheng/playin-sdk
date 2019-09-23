@@ -1,6 +1,5 @@
 package com.tech.playinsdk;
 
-import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;

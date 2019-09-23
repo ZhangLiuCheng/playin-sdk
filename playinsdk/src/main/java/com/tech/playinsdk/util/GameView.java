@@ -2,6 +2,7 @@ package com.tech.playinsdk.util;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.media.AudioFormat;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -12,6 +13,7 @@ import com.tech.playinsdk.connect.PlaySocket;
 import com.tech.playinsdk.decoder.AudioDecoder;
 import com.tech.playinsdk.decoder.FFmpegDecoder;
 import com.tech.playinsdk.decoder.VideoDecoder;
+import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.model.entity.PlayInfo;
 
 import org.json.JSONException;
@@ -203,8 +205,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
             try {
                 JSONObject object = new JSONObject(msg);
                 if (0 != object.optInt("code")) {
-                    invokeGameError(new Exception(object.optString("onPlayError")));
+                    invokeGameError(new HttpException(-1, object.optString("error")));
                 }
+
+                // ios 默认音频参数
+                int sampleRateInHz = 22050;
+                int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
+                int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+                if (playInfo.getOsType() == 2) {
+                    // android 默认音频参数
+                    sampleRateInHz = 24000;
+                    channelConfig = 3;
+                    audioFormat = 2;
+                }
+                audioDecoder.initAudioTrack(sampleRateInHz, channelConfig, audioFormat);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
