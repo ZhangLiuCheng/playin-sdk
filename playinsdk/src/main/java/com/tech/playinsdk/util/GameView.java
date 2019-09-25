@@ -218,6 +218,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
                     channelConfig = 3;
                     audioFormat = 2;
                 }
+                JSONObject streamInfo = object.optJSONObject("stream_info");
+                if (null != streamInfo) {
+                    sampleRateInHz = streamInfo.optInt("sample_rate");
+                    channelConfig = streamInfo.optInt("channels");
+                    int bps = streamInfo.optInt("bits_per_sample");
+                    if (bps == 16) audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+                    else if (bps == 8) audioFormat = AudioFormat.ENCODING_PCM_8BIT;
+                }
                 audioDecoder.initAudioTrack(sampleRateInHz, channelConfig, audioFormat);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -226,6 +234,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
         @Override
         public void onMessage(int streamType, byte[] buf) {
+//            PlayLog.e("onMessage  " + streamType + " ====  " + buf.length);
             if (GameView.this.visibility == 0) {
                 if (streamType == Constants.StreamType.H264) {
                     if (null != videodecoder) videodecoder.sendVideoData(buf);

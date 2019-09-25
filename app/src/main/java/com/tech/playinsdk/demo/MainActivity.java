@@ -1,6 +1,7 @@
 package com.tech.playinsdk.demo;
 
 import android.content.Intent;
+import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
