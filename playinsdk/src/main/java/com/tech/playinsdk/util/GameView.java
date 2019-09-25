@@ -124,35 +124,77 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float rateWidth = event.getX() / getWidth();
-        float rateHeight = event.getY() / getHeight();
+//        float rateWidth = event.getX() / getWidth();
+//        float rateHeight = event.getY() / getHeight();
+//
+//        int action = event.getAction();  // 0 down, 1 up, 2 move
+//        // 目标触摸 0-down,1-move,2-up
+//        if (action == 1) {
+//            action = 2;
+//        } else if (action == 2) {
+//            action = 1;
+//        }
+//        controlBuilder.delete(0, controlBuilder.length());
+//        controlBuilder.append(rateWidth).append("_")
+//                .append(rateHeight).append("_")
+//                .append(action)
+//                .append("_0_0");
+//        sendControl(event.getPointerCount(), controlBuilder.toString());
 
-        int action = event.getAction();  // 0 down, 1 up, 2 move
-        // 目标触摸 0-down,1-move,2-up
+        int action = event.getActionMasked();
+        int pointerCount = event.getPointerCount();
+        MotionEvent.PointerProperties[] pps = new MotionEvent.PointerProperties[pointerCount];
+        MotionEvent.PointerCoords[] pcs = new MotionEvent.PointerCoords[pointerCount];
+        for (int i = 0; i < pointerCount; i ++) {
+            MotionEvent.PointerProperties pp = new MotionEvent.PointerProperties();
+            event.getPointerProperties(i, pp);
+            pps[i] = pp;
+            MotionEvent.PointerCoords pc = new MotionEvent.PointerCoords();
+            event.getPointerCoords(i, pc);
+            pcs[i] = pc;
+        }
+        GameEvent gameEvent = new GameEvent();
+
+        // 兼容ios
         if (action == 1) {
             action = 2;
         } else if (action == 2) {
             action = 1;
         }
-        controlBuilder.delete(0, controlBuilder.length());
-        controlBuilder.append(rateWidth).append("_")
-                .append(rateHeight).append("_")
-                .append(action)
-                .append("_0_0");
-        sendControl(event.getPointerCount(), controlBuilder.toString());
+        gameEvent.action = action;
+        gameEvent.pointerCount = pointerCount;
+        gameEvent.properties = pps;
+        gameEvent.coords = pcs;
+        String conStr = convertGameEvent(gameEvent);
+        playSocket.sendControl(conStr);
         return true;
     }
 
-    private void sendControl(int finger, String control) {
-        if (null != playSocket && playSocket.isConnected()) {
+//    private void sendControl(int finger, String control) {
+//        if (null != playSocket && playSocket.isConnected()) {
+//            try {
+//                JSONObject obj = new JSONObject();
+//                obj.put("" + finger, control);
+//                playSocket.sendControl(obj.toString());
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+
+    private String convertGameEvent(GameEvent gameEvent) {
+        JSONObject obj = new JSONObject();
+        for (int i = 0; i < gameEvent.pointerCount; i++) {
             try {
-                JSONObject obj = new JSONObject();
-                obj.put("" + finger, control);
-                playSocket.sendControl(obj.toString());
+                float rateWidth = gameEvent.coords[i].x / getWidth();
+                float rateHeight = gameEvent.coords[i].y / getHeight();
+                String control = rateWidth + "_" + rateHeight + "_" + gameEvent.action + "_0_0";
+                obj.put("" + gameEvent.properties[i].id, control);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        return obj.toString();
     }
 
 
@@ -276,5 +318,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
                 }
             }
         });
+    }
+
+    private class GameEvent {
+        int action;
+        int pointerCount;
+        MotionEvent.PointerProperties[] properties;
+        MotionEvent.PointerCoords[] coords;
     }
 }
