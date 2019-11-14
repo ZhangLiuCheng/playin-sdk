@@ -72,8 +72,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
             height = playInfo.getDeviceWidth();
         }
 
-        videodecoder = new FFmpegDecoder(width, height);
-//        videodecoder = new MediaDecoder(playInfo.getDeviceWidth(), playInfo.getDeviceHeight());
+        videodecoder = new FFmpegDecoder(width, height, 0);
         videodecoder.setDecoderListener(this);
         videodecoder.start();
     }
