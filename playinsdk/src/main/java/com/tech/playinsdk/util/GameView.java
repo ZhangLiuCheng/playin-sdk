@@ -147,11 +147,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         GameEvent gameEvent = new GameEvent();
 
         // 兼容ios
+        if (playInfo.getOsType() == 1) {
+            action %= 5;
+        }
         if (action == 1) {
             action = 2;
         } else if (action == 2) {
             action = 1;
         }
+
         gameEvent.action = action;
         gameEvent.pointerCount = pointerCount;
         gameEvent.properties = pps;
@@ -181,6 +185,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
                 }
                 String control = rateWidth + "_" + rateHeight + "_" + gameEvent.action + "_0_0";
                 obj.put("" + gameEvent.properties[i].id, control);
+
+                // 第二个手指down和up的时候会影响第一个手指，这边强行做下修复，有时间在优化
+                if (playInfo.getOsType() == 1) {
+                    if (obj.length() > 1) {
+                        String key = String.valueOf(obj.length() - 1);
+                        String value = obj.optString(key);
+                        int action = Integer.parseInt(value.split("_")[2]);
+                        if (action == 0 || action == 2) {
+                            obj = new JSONObject();
+                            obj.put(key, value);
+                        }
+                    }
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }

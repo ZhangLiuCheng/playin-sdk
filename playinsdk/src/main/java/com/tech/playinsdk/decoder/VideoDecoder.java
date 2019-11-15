@@ -58,8 +58,7 @@ public abstract class VideoDecoder implements Runnable {
     }
 
     public synchronized void setDisplayHolder(SurfaceHolder holder) {
-        PlayLog.e("VideoDecoder  setDisplayHolder");
-
+//        PlayLog.e("VideoDecoder  setDisplayHolder");
         if (initDecoder(holder.getSurface())) {
             initCodec = true;
         }
@@ -80,12 +79,12 @@ public abstract class VideoDecoder implements Runnable {
 
     public void pause() {
         initCodec = false;
-        PlayLog.e("VideoDecoder  pause");
+//        PlayLog.e("VideoDecoder  pause");
     }
 
     public void resume() {
         initCodec = true;
-        PlayLog.e("VideoDecoder  resume");
+//        PlayLog.e("VideoDecoder  resume");
     }
 
     public void stop() {

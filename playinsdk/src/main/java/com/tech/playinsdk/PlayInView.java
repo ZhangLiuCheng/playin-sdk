@@ -36,6 +36,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
     private int videoTime;
     private int totalTime;
+    private boolean autoRotate;
 
     private boolean isDetached, isPause, isFinish, isDownload;
 
@@ -80,8 +81,13 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
      * @param listener
      */
     public void play(String adid, int playDuration, final PlayListener listener) {
+        this.play(adid, playDuration, true, listener);
+    }
+
+    public void play(String adid, int playDuration, boolean autoRotate, final PlayListener listener) {
         this.videoTime = playDuration;
         this.playListener = listener;
+        this.autoRotate = autoRotate;
         this.requestPlayInfo(adid);
     }
 
@@ -214,6 +220,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void setScreenOrientation(PlayInfo playInfo) {
+        if (!autoRotate) return;
         try {
             Activity curActivity = (Activity) getContext();
             if (playInfo.getOrientation() == 0) {
@@ -229,6 +236,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void adapterGameSize() {
+        if (playInfo == null) return;
         GameView gameView = findViewById(R.id.gameview);
         if (getWidth() != 0 && getHeight() != 0) {
             int srcWidth = playInfo.getDeviceWidth();
