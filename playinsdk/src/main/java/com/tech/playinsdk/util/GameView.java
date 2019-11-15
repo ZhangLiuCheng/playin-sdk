@@ -28,8 +28,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     }
 
     private final Handler handler = new Handler();
-    private final StringBuilder controlBuilder = new StringBuilder();
-
     private VideoDecoder videodecoder;
     private AudioDecoder audioDecoder;
 
@@ -59,20 +57,31 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         this.playListener = listener;
         playSocket = new MyPlaySocket(playInfo.getServerIp(), playInfo.getServerPort());
         playSocket.connect();
+        initAudioDecoder();
+        initVideoDecoder();
+    }
 
+    private void initAudioDecoder() {
         audioDecoder = new AudioDecoder();
         audioDecoder.start();
+    }
 
+    private void initVideoDecoder() {
         int width = playInfo.getDeviceWidth();
         int height = playInfo.getDeviceHeight();
-
-        if (playInfo.getOsType() == 2 && playInfo.getOrientation() == 1) {
-            // android 设备端 并且是 横屏
-            width = playInfo.getDeviceHeight();
-            height = playInfo.getDeviceWidth();
+        int rotate = 0;
+        // 横屏
+        if (playInfo.getOrientation() == 1) {
+            if (playInfo.getOsType() == 1) {
+                // ios 设备端
+                rotate = 270;
+            } else if (playInfo.getOsType() == 2) {
+                // android 设备端
+                width = playInfo.getDeviceHeight();
+                height = playInfo.getDeviceWidth();
+            }
         }
-
-        videodecoder = new FFmpegDecoder(width, height, 0);
+        videodecoder = new FFmpegDecoder(width, height, rotate);
         videodecoder.setDecoderListener(this);
         videodecoder.start();
     }
@@ -123,23 +132,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-//        float rateWidth = event.getX() / getWidth();
-//        float rateHeight = event.getY() / getHeight();
-//
-//        int action = event.getAction();  // 0 down, 1 up, 2 move
-//        // 目标触摸 0-down,1-move,2-up
-//        if (action == 1) {
-//            action = 2;
-//        } else if (action == 2) {
-//            action = 1;
-//        }
-//        controlBuilder.delete(0, controlBuilder.length());
-//        controlBuilder.append(rateWidth).append("_")
-//                .append(rateHeight).append("_")
-//                .append(action)
-//                .append("_0_0");
-//        sendControl(event.getPointerCount(), controlBuilder.toString());
-
         int action = event.getActionMasked();
         int pointerCount = event.getPointerCount();
         MotionEvent.PointerProperties[] pps = new MotionEvent.PointerProperties[pointerCount];
@@ -169,24 +161,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         return true;
     }
 
-//    private void sendControl(int finger, String control) {
-//        if (null != playSocket && playSocket.isConnected()) {
-//            try {
-//                JSONObject obj = new JSONObject();
-//                obj.put("" + finger, control);
-//                playSocket.sendControl(obj.toString());
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
     private String convertGameEvent(GameEvent gameEvent) {
         JSONObject obj = new JSONObject();
         for (int i = 0; i < gameEvent.pointerCount; i++) {
             try {
-                float rateWidth = gameEvent.coords[i].x / getWidth();
-                float rateHeight = gameEvent.coords[i].y / getHeight();
+                float rateWidth;
+                float rateHeight;
+                // ios 横屏需转换坐标
+                if (playInfo.getOrientation() == 1 && playInfo.getOsType() == 1) {
+                    float x = getHeight() - gameEvent.coords[i].y;
+                    float y = gameEvent.coords[i].x;
+                    rateWidth =  x / getHeight();
+                    rateHeight = y / getWidth();
+                } else {
+                    float x = gameEvent.coords[i].x;
+                    float y = gameEvent.coords[i].y;
+                    rateWidth =  x / getWidth();
+                    rateHeight = y / getHeight();
+                }
                 String control = rateWidth + "_" + rateHeight + "_" + gameEvent.action + "_0_0";
                 obj.put("" + gameEvent.properties[i].id, control);
             } catch (JSONException e) {
@@ -195,7 +187,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         }
         return obj.toString();
     }
-
 
     private void sendUserContect() {
         try {

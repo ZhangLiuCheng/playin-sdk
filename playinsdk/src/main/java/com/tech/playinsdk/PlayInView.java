@@ -3,17 +3,17 @@ package com.tech.playinsdk;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tech.playinsdk.http.HttpException;
@@ -71,7 +71,6 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             }
             isPause = true;
         }
-
     }
 
     /**
@@ -84,6 +83,17 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         this.videoTime = playDuration;
         this.playListener = listener;
         this.requestPlayInfo(adid);
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        getHandler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                adapterGameSize();
+            }
+        }, 200);
     }
 
     @Override
@@ -132,6 +142,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
                 if (isDetached) return;
                 playInfo = result;
 
+
                 // 测试数据  begin
 //                result.setOsType(2);
 //                result.setOrientation(1);
@@ -139,10 +150,10 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 //                videoTime = 5;
                 // end
 
+                LayoutInflater.from(getContext()).inflate(R.layout.playin_view, PlayInView.this);
                 initView(result);
                 initData(result);
                 connectPlayIn(result);
-                setScreenOrientation(result);
             }
 
             @Override
@@ -152,46 +163,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         });
     }
 
-    private void setScreenOrientation(PlayInfo playInfo) {
-        try {
-            Activity curActivity = (Activity) getContext();
-            if (playInfo.getOsType() == 1) {
-                // ios 设备端全部是竖屏
-                curActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            } else {
-                // android 设备端动态旋转
-                if (playInfo.getOrientation() == 0) {
-                    // 竖屏
-                    curActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                } else {
-                    // 横屏
-                    curActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private View getFuncView(PlayInfo playInfo) {
-        View rootView;
-        if (playInfo.getOsType() == 1) {
-            // ios 设备端
-            if (playInfo.getOrientation() == 0) {
-                rootView = LayoutInflater.from(getContext()).inflate(R.layout.playin_view_portrait, null);
-            } else {
-                rootView = LayoutInflater.from(getContext()).inflate(R.layout.playin_view_landscape, null);
-            }
-        } else {
-            // android 设备端
-            rootView = LayoutInflater.from(getContext()).inflate(R.layout.playin_view_portrait, null);
-        }
-        return rootView;
-    }
-
     private void initView(PlayInfo playInfo) {
-        View rootView = getFuncView(playInfo);
-        this.addView(rootView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         appInfoView = findViewById(R.id.appInfoView);
         appInfoView.setOnClickListener(this);
         videoTimeTv = findViewById(R.id.videoTimeTv);
@@ -200,14 +172,12 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         findViewById(R.id.downloadTv).setOnClickListener(this);
         findViewById(R.id.menuLayout).setOnClickListener(this);
 
-
         Animation anim = AnimationUtils.loadAnimation(getContext(), R.anim.playin_menu);
         ImageView menuIv = findViewById(R.id.menuIv);
         menuIv.startAnimation(anim);
     }
 
     private void initData(PlayInfo playInfo) {
-        adapterLandscape();
         TextView appNameTv = findViewById(R.id.appName);
         TextView appAudienceTv = findViewById(R.id.appAudience);
         TextView appRateTv = findViewById(R.id.appRate);
@@ -233,35 +203,57 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         });
     }
 
-    private void adapterLandscape() {
-        if (playInfo.getOsType() == 1) {
-            // ios 设备端
-            if (playInfo.getOrientation() == 1) {
-                // 横屏
-                View fixBug = findViewById(R.id.fixbug);
-                if (fixBug != null) fixBug.setVisibility(VISIBLE);
-
-                View appView = findViewById(R.id.appView);
-                appView.setRotation(90);
-                appView.setTranslationY(-TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 70, getResources().getDisplayMetrics()));
-            }
-        } else {
-            // android 设备端
-            if (playInfo.getOrientation() == 1) {
-                // 横屏
-                View appView = findViewById(R.id.appView);
-                ViewGroup.LayoutParams params = appView.getLayoutParams();
-                params.width = getResources().getDisplayMetrics().heightPixels * 2 / 3;
-                appView.setLayoutParams(params);
-            }
-        }
-    }
-
     private void connectPlayIn(PlayInfo playInfo) {
         videoTime = Math.min(videoTime, playInfo.getDuration());
         totalTime = playInfo.getDuration();
         GameView gameView = findViewById(R.id.gameview);
         gameView.startConnect(playInfo, PlayInView.this);
+
+        setScreenOrientation(playInfo);
+        adapterGameSize();
+    }
+
+    private void setScreenOrientation(PlayInfo playInfo) {
+        try {
+            Activity curActivity = (Activity) getContext();
+            if (playInfo.getOrientation() == 0) {
+                // 竖屏
+                curActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            } else {
+                // 横屏
+                curActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void adapterGameSize() {
+        GameView gameView = findViewById(R.id.gameview);
+        if (getWidth() != 0 && getHeight() != 0) {
+            int srcWidth = playInfo.getDeviceWidth();
+            int srcHeight = playInfo.getDeviceHeight();
+            // 横屏
+            if (playInfo.getOrientation() == 1) {
+                srcWidth = playInfo.getDeviceHeight();
+                srcHeight = playInfo.getDeviceWidth();
+            }
+            int destWidth;
+            int destHeight;
+            float scaleWidth = getWidth() * 1.0f / srcWidth;
+            float scaleHeight = getHeight() * 1.0f / srcHeight;
+            if (scaleWidth < scaleHeight) {
+                destWidth = getWidth();
+                destHeight = (int) (getWidth() * 1.0f * srcHeight / srcWidth);
+            } else {
+                destWidth = (int) (getHeight() * 1.0f * srcWidth / srcHeight);
+                destHeight = getHeight();
+            }
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) gameView.getLayoutParams();
+            params.width = destWidth;
+            params.height = destHeight;
+            gameView.setLayoutParams(params);
+        }
     }
 
     private void goDownload() {
@@ -273,6 +265,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private Runnable videoTimeRunnable = new Runnable() {
         @Override
         public void run() {
+            if (null == videoTimeTv) return;
             videoTimeTv.setText("Skip Ads ( " + videoTime + " )");
             videoTime--;
             if (videoTime >= 0) {
@@ -329,13 +322,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private void showMenuInfo() {
         if (findViewById(R.id.menuLayout).getVisibility() == GONE) return;
         findViewById(R.id.menuLayout).setVisibility(GONE);          // 隐藏menu
-
-        int animId = playInfo.getOrientation() == 0 ? R.anim.playin_portrait_in : R.anim.playin_landscape_in;
-        if (playInfo.getOsType() == 2) {
-            // 安卓设备端
-            animId = R.anim.playin_portrait_in;
-        }
-        Animation anim = AnimationUtils.loadAnimation(getContext(), animId);
+        Animation anim = AnimationUtils.loadAnimation(getContext(), R.anim.playin_portrait_in);
         appInfoView.setVisibility(VISIBLE);                         // 显示下载弹窗
         appInfoView.startAnimation(anim);
     }
@@ -343,12 +330,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private void hidMenuInfo() {
         if (appInfoView.getVisibility() == GONE) return;
         appInfoView.setVisibility(GONE);
-        int animId = playInfo.getOrientation() == 0 ? R.anim.playin_portrait_out : R.anim.playin_landscape_out;
-        if (playInfo.getOsType() == 2) {
-            // 安卓设备端
-            animId = R.anim.playin_portrait_out;
-        }
-        Animation anim = AnimationUtils.loadAnimation(getContext(), animId);
+        Animation anim = AnimationUtils.loadAnimation(getContext(), R.anim.playin_portrait_out);
         anim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {}
