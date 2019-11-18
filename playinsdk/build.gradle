@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 9
-        versionName "1.1.2"
+        versionCode 10
+        versionName "1.1.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -56,7 +56,7 @@ publish {
     userOrg = 'zhangliucheng'
     groupId = 'com.tech'
     artifactId = 'playinsdk'
-    publishVersion = '1.1.2'
+    publishVersion = '1.1.3'
     desc = 'PlayIN ADs -The Next Generation Playable ADs Solution'
     website = 'https://github.com/playinads'
 }
