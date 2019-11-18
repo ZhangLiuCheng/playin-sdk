@@ -11,10 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.http.HttpHelper;
@@ -36,7 +38,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
     private int videoTime;
     private int totalTime;
-    private boolean autoRotate;
+    private boolean autoRotate, audioOn;
 
     private boolean isDetached, isPause, isFinish, isDownload;
 
@@ -81,13 +83,14 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
      * @param listener
      */
     public void play(String adid, int playDuration, final PlayListener listener) {
-        this.play(adid, playDuration, true, listener);
+        this.play(adid, playDuration, true, true, listener);
     }
 
-    public void play(String adid, int playDuration, boolean autoRotate, final PlayListener listener) {
+    public void play(String adid, int playDuration, boolean autoRotate, boolean audioOn, final PlayListener listener) {
         this.videoTime = playDuration;
         this.playListener = listener;
         this.autoRotate = autoRotate;
+        this.audioOn = audioOn;
         this.requestPlayInfo(adid);
     }
 
@@ -147,15 +150,6 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             public void success(PlayInfo result) {
                 if (isDetached) return;
                 playInfo = result;
-
-
-                // 测试数据  begin
-//                result.setOsType(2);
-//                result.setOrientation(1);
-//                result.setDuration(30);
-//                videoTime = 5;
-                // end
-
                 LayoutInflater.from(getContext()).inflate(R.layout.playin_view, PlayInView.this);
                 initView(result);
                 initData(result);
@@ -181,6 +175,25 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         Animation anim = AnimationUtils.loadAnimation(getContext(), R.anim.playin_menu);
         ImageView menuIv = findViewById(R.id.menuIv);
         menuIv.startAnimation(anim);
+
+        initVoiceView();
+    }
+
+    // 加载声音控制
+    private void initVoiceView() {
+        final GameView gameView = findViewById(R.id.gameview);
+        gameView.setAudioState(audioOn);
+
+        ToggleButton voiceTb = findViewById(R.id.voice);
+        voiceTb.setVisibility(View.VISIBLE);
+        voiceTb.setChecked(audioOn);
+        voiceTb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                PlayInView.this.audioOn = isChecked;
+                gameView.setAudioState(isChecked);
+            }
+        });
     }
 
     private void initData(PlayInfo playInfo) {

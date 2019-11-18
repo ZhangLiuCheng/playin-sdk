@@ -35,6 +35,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     private PlayInfo playInfo;
     private PlaySocket playSocket;
     private int visibility;
+    private boolean audioOn = true;
 
     public GameView(Context context) {
         super(context);
@@ -44,6 +45,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
+    }
+
+    public void setAudioState(boolean on) {
+        this.audioOn = on;
     }
 
     private void init() {
@@ -288,7 +293,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
                 if (streamType == Constants.StreamType.H264) {
                     if (null != videodecoder) videodecoder.sendVideoData(buf);
                 } else if (streamType == Constants.StreamType.PCM) {
-                    if (null != audioDecoder) audioDecoder.sendAudioData(buf);
+                    if (null != audioDecoder && audioOn) audioDecoder.sendAudioData(buf);
                 }
             }
         }
