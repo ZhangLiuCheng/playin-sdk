@@ -184,7 +184,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         final GameView gameView = findViewById(R.id.gameview);
         gameView.setAudioState(audioOn);
 
-        ToggleButton voiceTb = findViewById(R.id.voice);
+        ToggleButton voiceTb = findViewById(R.id.audioTb);
         voiceTb.setVisibility(View.VISIBLE);
         voiceTb.setChecked(audioOn);
         voiceTb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

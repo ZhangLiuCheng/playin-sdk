@@ -176,12 +176,12 @@
         android:layout_height="match_parent">
 
         <ToggleButton
-            android:id="@+id/voice"
+            android:id="@+id/audioTb"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:padding="3dp"
             android:layout_margin="8dp"
-            android:background="@drawable/toggle_voice"
+            android:background="@drawable/playin_audio"
             android:checked="true"
             android:textOff="@null"
             android:textOn="@null" />
