@@ -34,7 +34,7 @@ private:
     AVCodecContext *pCodecCtx = NULL;
     AVCodec *pCodec;
     jobject surface;
-    int rotate, len, got_frame;
+    int width, height, rotate, len, got_frame;
 
     void resetNativeWindow(JNIEnv *env);
     AVFrame* processYuv(AVFrame *yuvFrame);

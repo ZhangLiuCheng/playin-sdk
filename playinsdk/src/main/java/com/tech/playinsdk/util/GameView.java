@@ -5,6 +5,7 @@ import android.graphics.PixelFormat;
 import android.media.AudioFormat;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -137,7 +138,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int action = event.getActionMasked();
         int pointerCount = event.getPointerCount();
         MotionEvent.PointerProperties[] pps = new MotionEvent.PointerProperties[pointerCount];
         MotionEvent.PointerCoords[] pcs = new MotionEvent.PointerCoords[pointerCount];
@@ -150,11 +150,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
             pcs[i] = pc;
         }
         GameEvent gameEvent = new GameEvent();
-
+        int action;
         // 兼容ios
         if (playInfo.getOsType() == 1) {
+            action = event.getActionMasked();
             action %= 5;
+        } else {
+            action = event.getAction();
         }
+
         if (action == 1) {
             action = 2;
         } else if (action == 2) {
