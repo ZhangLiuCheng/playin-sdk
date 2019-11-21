@@ -27,6 +27,9 @@ int FFmpeg::init(JNIEnv *env, jobject instance, jint width, jint height, jint ro
         LOGE("%s","无法解码");
         return -1;
     }
+
+    LOGE("init  ---------- %d ===  %d ", width, height);
+
     pCodecCtx = avcodec_alloc_context3(pCodec);
     pCodecCtx->frame_number = 1;
     pCodecCtx->width = width;
@@ -84,7 +87,6 @@ void FFmpeg::updateSurface(JNIEnv *env, jobject surface) {
 }
 
 void FFmpeg::updateRotate(JNIEnv *env, jint rotate) {
-    LOGE("updateRotate  ----------  %d", rotate);
     if (this->rotate == rotate) {
         return;
     }
@@ -122,6 +124,12 @@ AVFrame* FFmpeg::processYuv(AVFrame *yuvFrame) {
     } else {
         // 调换宽和高
         destFrame = mallocRGBFrame(videoHeight, videoWidth);
+    }
+
+    LOGE("yuvFrame  ---------- 11  %d", yuvFrame->width);
+
+    if (rotate == 0) {
+        return rgbFrame;
     }
     libyuv::ARGBRotate(rgbFrame->data[0], rgbFrame->linesize[0], destFrame->data[0], destFrame->linesize[0],
                        videoWidth, videoHeight, (libyuv::RotationMode)rotate);

@@ -18,13 +18,14 @@ find_library(
 include_directories(${CMAKE_SOURCE_DIR}/ffmpeg/include)
 include_directories(${CMAKE_SOURCE_DIR}/yuv/include)
 
+
 add_library(
-        libyun
+        libyuv
         SHARED
         IMPORTED
 )
 set_target_properties(
-        libyun
+        libyuv
         PROPERTIES IMPORTED_LOCATION
         ${CMAKE_SOURCE_DIR}/yuv/libs/${ANDROID_ABI}/libyuv.so
 )
@@ -32,7 +33,7 @@ set_target_properties(
 target_link_libraries(
         playin
         -lm -lz -landroid
-        libyun
+        libyuv
         ${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDROID_ABI}/libavformat.a
         ${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDROID_ABI}/libavcodec.a
         ${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDROID_ABI}/libswscale.a

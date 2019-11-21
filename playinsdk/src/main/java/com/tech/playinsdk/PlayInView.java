@@ -149,6 +149,11 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             @Override
             public void success(PlayInfo result) {
                 if (isDetached) return;
+
+                // TODO 测试数据
+//                result.setOsType(2);
+//                result.setOrientation(1);
+
                 playInfo = result;
                 LayoutInflater.from(getContext()).inflate(R.layout.playin_view, PlayInView.this);
                 initView(result);

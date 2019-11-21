@@ -3,16 +3,12 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.tech.playinsdk.demo"
+        applicationId "com.tech.playinsdk"
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 1
         versionName "1.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-        ndk {
-            abiFilters "armeabi-v7a"
-        }
     }
     buildTypes {
         release {
