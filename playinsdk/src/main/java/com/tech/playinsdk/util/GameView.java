@@ -5,7 +5,6 @@ import android.graphics.PixelFormat;
 import android.media.AudioFormat;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -138,80 +137,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int pointerCount = event.getPointerCount();
-        MotionEvent.PointerProperties[] pps = new MotionEvent.PointerProperties[pointerCount];
-        MotionEvent.PointerCoords[] pcs = new MotionEvent.PointerCoords[pointerCount];
-        for (int i = 0; i < pointerCount; i ++) {
-            MotionEvent.PointerProperties pp = new MotionEvent.PointerProperties();
-            event.getPointerProperties(i, pp);
-            pps[i] = pp;
-            MotionEvent.PointerCoords pc = new MotionEvent.PointerCoords();
-            event.getPointerCoords(i, pc);
-            pcs[i] = pc;
+        String conStr = TouchUtil.processTouchEvent(event, getWidth(), getHeight(), playInfo);
+        if (null != conStr) {
+            playSocket.sendControl(conStr);
         }
-        GameEvent gameEvent = new GameEvent();
-        int action;
-        // 兼容ios
-        if (playInfo.getOsType() == 1) {
-            action = event.getActionMasked();
-            action %= 5;
-        } else {
-            action = event.getAction();
-        }
-
-        if (action == 1) {
-            action = 2;
-        } else if (action == 2) {
-            action = 1;
-        }
-
-        gameEvent.action = action;
-        gameEvent.pointerCount = pointerCount;
-        gameEvent.properties = pps;
-        gameEvent.coords = pcs;
-        String conStr = convertGameEvent(gameEvent);
-        playSocket.sendControl(conStr);
         return true;
-    }
-
-    private String convertGameEvent(GameEvent gameEvent) {
-        JSONObject obj = new JSONObject();
-        for (int i = 0; i < gameEvent.pointerCount; i++) {
-            try {
-                float rateWidth;
-                float rateHeight;
-                // ios 横屏需转换坐标
-                if (playInfo.getOrientation() == 1 && playInfo.getOsType() == 1) {
-                    float x = getHeight() - gameEvent.coords[i].y;
-                    float y = gameEvent.coords[i].x;
-                    rateWidth =  x / getHeight();
-                    rateHeight = y / getWidth();
-                } else {
-                    float x = gameEvent.coords[i].x;
-                    float y = gameEvent.coords[i].y;
-                    rateWidth =  x / getWidth();
-                    rateHeight = y / getHeight();
-                }
-                String control = rateWidth + "_" + rateHeight + "_" + gameEvent.action + "_0_0";
-                obj.put("" + gameEvent.properties[i].id, control);
-
-                // 第二个手指down和up的时候会影响第一个手指，这边强行做下修复，有时间在优化
-                if (playInfo.getOsType() == 1) {
-                    if (obj.length() > 1) {
-                        String key = String.valueOf(obj.length() - 1);
-                        String value = obj.optString(key);
-                        int action = Integer.parseInt(value.split("_")[2]);
-                        if (action == 0 || action == 2) {
-                            obj = new JSONObject();
-                            obj.put(key, value);
-                        }
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return obj.toString();
     }
 
     private void sendUserContect() {
@@ -234,7 +164,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
                 try {
                     Thread.sleep(2000);
                     playSocket.sendStream(Constants.PacketType.STREAM, Constants.StreamType.ANDROID_VIDEO_START, "");
-
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -334,12 +263,5 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
                 }
             }
         });
-    }
-
-    private class GameEvent {
-        int action;
-        int pointerCount;
-        MotionEvent.PointerProperties[] properties;
-        MotionEvent.PointerCoords[] coords;
     }
 }
