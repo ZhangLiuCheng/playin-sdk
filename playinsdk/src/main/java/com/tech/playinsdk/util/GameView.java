@@ -66,6 +66,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         initVideoDecoder();
     }
 
+    /**
+     * 设置视频清晰度
+     * @param quality
+     */
+    public void sendVideoQuality(int quality) {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("video_quality", quality);
+            playSocket.sendStream(Constants.PacketType.STREAM, Constants.StreamType.PARAMS, obj.toString());
+        } catch (Exception ex) {
+            PlayLog.e("sendVideoQuality  exception :" + ex);
+        }
+    }
+
     private void initAudioDecoder() {
         audioDecoder = new AudioDecoder();
         audioDecoder.start();

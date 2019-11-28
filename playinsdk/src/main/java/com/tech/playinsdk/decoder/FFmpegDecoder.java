@@ -23,7 +23,6 @@ public class FFmpegDecoder extends VideoDecoder {
 
     @Override
     protected boolean initDecoder(Surface surface) {
-//        releaseDecoder();
         boolean result = ffmpegInit(videoWidth, videoHeight, videoRotate, surface) >= 0;
         init = result;
         return result;

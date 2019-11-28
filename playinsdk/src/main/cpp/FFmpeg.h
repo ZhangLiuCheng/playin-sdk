@@ -29,7 +29,7 @@ public:
     void updateRotate(JNIEnv *env, jint rotate);
 
 private:
-    ANativeWindow *nativeWindow = NULL;
+    ANativeWindow *mNativeWindow = NULL;
     ANativeWindow_Buffer windowBuffer;
     AVCodecContext *pCodecCtx = NULL;
     AVCodec *pCodec;
@@ -39,7 +39,7 @@ private:
     void resetNativeWindow(JNIEnv *env);
     AVFrame* processYuv(AVFrame *yuvFrame);
     AVFrame* mallocRGBFrame(int width, int height);
-    void renderWindow(AVFrame *destFrame);
+    void renderWindow(AVFrame *destFrame, int videoWidth, int videoHeight);
 };
 
 

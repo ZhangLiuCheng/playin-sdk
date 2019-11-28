@@ -175,6 +175,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <Spinner
+            android:id="@+id/qualitySp"
+            android:layout_width="wrap_content"
+            android:layout_height="33dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:background="#FFFFFF"
+            android:entries="@array/quality"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:layout_margin="10dp">
+        </Spinner>
+
         <ToggleButton
             android:id="@+id/audioTb"
             android:layout_width="25dp"

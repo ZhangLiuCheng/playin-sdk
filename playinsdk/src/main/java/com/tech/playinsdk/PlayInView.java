@@ -11,10 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -182,6 +184,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         menuIv.startAnimation(anim);
 
         initVoiceView();
+        initqualityView();
     }
 
     // 加载声音控制
@@ -197,6 +200,21 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 PlayInView.this.audioOn = isChecked;
                 gameView.setAudioState(isChecked);
+            }
+        });
+    }
+
+    private void initqualityView() {
+        final GameView gameView = findViewById(R.id.gameview);
+        Spinner spinner = findViewById(R.id.qualitySp);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                gameView.sendVideoQuality(position + 1);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
     }

@@ -53,15 +53,23 @@ int FFmpeg::decoding(JNIEnv *env, jobject instance, jbyteArray data) {
     AVFrame *yuvFrame = av_frame_alloc();
     avcodec_decode_video2(pCodecCtx, yuvFrame, &got_frame, &packet);
 
-    if (got_frame && nativeWindow != NULL) {
-        ANativeWindow_lock(nativeWindow, &windowBuffer, NULL);
-        // yuv转rgb，并且旋转
-        AVFrame *destFrame = processYuv(yuvFrame);
-        // 渲染数据
-        renderWindow(destFrame);
-        ANativeWindow_unlockAndPost(nativeWindow);
-        av_free(destFrame->data[0]);
-        av_free(destFrame);
+    if (got_frame && yuvFrame->width != 0) {
+        if (rotate % 180 != 0) {
+            ANativeWindow_setBuffersGeometry(mNativeWindow, yuvFrame->height, yuvFrame->width, WINDOW_FORMAT_RGBA_8888);
+        } else {
+            ANativeWindow_setBuffersGeometry(mNativeWindow, yuvFrame->width, yuvFrame->height, WINDOW_FORMAT_RGBA_8888);
+        }
+        ANativeWindow_acquire(mNativeWindow);
+        if (0 == ANativeWindow_lock(mNativeWindow, &windowBuffer, NULL)) {
+
+            AVFrame *destFrame = processYuv(yuvFrame);                      // yuv转rgb，并且旋转
+            renderWindow(destFrame, yuvFrame->width, yuvFrame->height);     // 渲染数据
+            ANativeWindow_unlockAndPost(mNativeWindow);
+
+            av_free(destFrame->data[0]);
+            av_free(destFrame);
+        }
+        ANativeWindow_release(mNativeWindow);
     }
     av_free(yuvFrame);
     av_free_packet(&packet);
@@ -73,10 +81,6 @@ void FFmpeg::close() {
     if (NULL != pCodecCtx) {
         avcodec_close(pCodecCtx);
         avcodec_free_context(&pCodecCtx);
-    }
-
-    if (NULL != nativeWindow) {
-        ANativeWindow_release(nativeWindow);
     }
 }
 
@@ -95,20 +99,16 @@ void FFmpeg::updateRotate(JNIEnv *env, jint rotate) {
 
 
 void FFmpeg::resetNativeWindow(JNIEnv *env) {
-    int width = this->width;
-    int height = this->height;
-    if (rotate % 180 != 0) {
-        width = this->height;
-        height = this->width;
+    if (NULL != mNativeWindow) {
+        ANativeWindow_release(mNativeWindow);
     }
     ANativeWindow *nw = ANativeWindow_fromSurface(env, surface);
-    ANativeWindow_setBuffersGeometry(nw, width, height, WINDOW_FORMAT_RGBA_8888);
-    nativeWindow = nw;
+    mNativeWindow = nw;
 }
 
 AVFrame* FFmpeg::processYuv(AVFrame *yuvFrame) {
-    int videoWidth = this->width;
-    int videoHeight = this->height;
+    int videoWidth = yuvFrame->width;
+    int videoHeight = yuvFrame->height;
 
     AVFrame *rgbFrame = mallocRGBFrame(videoWidth, videoHeight);
     libyuv::I420ToARGB(yuvFrame->data[0], yuvFrame->linesize[0],
@@ -121,8 +121,7 @@ AVFrame* FFmpeg::processYuv(AVFrame *yuvFrame) {
     if (rotate % 180 == 0) {
         destFrame = mallocRGBFrame(videoWidth, videoHeight);
     } else {
-        // 调换宽和高
-        destFrame = mallocRGBFrame(videoHeight, videoWidth);
+        destFrame = mallocRGBFrame(videoHeight, videoWidth);    // 调换宽和高
     }
     libyuv::ARGBRotate(rgbFrame->data[0], rgbFrame->linesize[0], destFrame->data[0], destFrame->linesize[0],
                        videoWidth, videoHeight, (libyuv::RotationMode)rotate);
@@ -138,10 +137,7 @@ AVFrame* FFmpeg::mallocRGBFrame(int width, int height) {
     return rgbFrame;
 }
 
-void FFmpeg::renderWindow(AVFrame *destFrame) {
-    int videoWidth = this->width;
-    int videoHeight = this->height;
-
+void FFmpeg::renderWindow(AVFrame *destFrame, int videoWidth, int videoHeight) {
     uint8_t *dst = (uint8_t *) windowBuffer.bits;
     int dstStride = windowBuffer.stride * 4;
     uint8_t *src = destFrame->data[0];
