@@ -51,7 +51,7 @@ public abstract class VideoDecoder implements Runnable {
                 if (initCodec && null != buf && buf.length > 0) onFrame(buf, 0, buf.length);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         } finally {
             releaseDecoder();
         }
