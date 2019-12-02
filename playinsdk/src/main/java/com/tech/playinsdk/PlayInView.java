@@ -34,13 +34,13 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private PlayInfo playInfo;
     private PlayListener playListener;
 
-    private View appInfoView;
+    private View infoDialog;
     private TextView videoTimeTv;
     private TextView totalTimeTv;
 
     private int videoTime;
     private int totalTime;
-    private boolean autoRotate, audioOn;
+    private boolean autoRotate, audioOpen, showView;
 
     private boolean isDetached, isPause, isFinish, isDownload;
 
@@ -65,35 +65,15 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         super.onWindowVisibilityChanged(visibility);
         if (visibility == 0) {
             if (isPause) {
-                // 返回前台
-                getHandler().postDelayed(videoTimeRunnable, 1000);
+                getHandler().postDelayed(videoTimeRunnable, 1000);  // 返回前台
             }
             isPause = false;
         } else if (visibility == 4) {
             if (!isPause) {
-                // 进入后台
-                getHandler().removeCallbacks(videoTimeRunnable);
+                getHandler().removeCallbacks(videoTimeRunnable);               // 进入后台
             }
             isPause = true;
         }
-    }
-
-    /**
-     * playGame
-     * @param adid
-     * @param playDuration
-     * @param listener
-     */
-    public void play(String adid, int playDuration, final PlayListener listener) {
-        this.play(adid, playDuration, true, true, listener);
-    }
-
-    public void play(String adid, int playDuration, boolean autoRotate, boolean audioOn, final PlayListener listener) {
-        this.videoTime = playDuration;
-        this.playListener = listener;
-        this.autoRotate = autoRotate;
-        this.audioOn = audioOn;
-        this.requestPlayInfo(adid);
     }
 
     @Override
@@ -105,6 +85,42 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
                 adapterGameSize();
             }
         }, 200);
+    }
+
+    /**
+     * playGame
+     * @param adid
+     * @param playDuration
+     * @param listener
+     */
+    public void play(String adid, int playDuration, PlayListener listener) {
+        this.play(adid, playDuration, true, true, false, listener);
+    }
+
+    public void play(String adid, int playDuration, boolean audioOpen, boolean autoRotate,
+                     boolean showView, PlayListener listener) {
+        this.videoTime = playDuration;
+        this.audioOpen = audioOpen;
+        this.autoRotate = autoRotate;
+        this.showView = showView;
+        this.playListener = listener;
+        this.requestPlayInfo(adid);
+    }
+
+    public void setAudioOpen(boolean audioOpen) {
+        this.audioOpen = audioOpen;
+        initVoiceView();
+    }
+
+    public void setAutoRotate(boolean rotate) {
+        this.autoRotate = rotate;
+        setScreenOrientation();
+    }
+
+    public void setShowView(boolean show) {
+        this.showView = show;
+        View infoView = findViewById(R.id.infoView);
+        if (null != infoView) infoView.setVisibility(this.showView ? VISIBLE : GONE);
     }
 
     @Override
@@ -120,10 +136,9 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             playListener.onPlayError(ex);
         }
         try {
+            getHandler().removeCallbacksAndMessages(null);
             reportPlayEnd();
             showPlayFinish();
-            // 异常
-            getHandler().removeCallbacksAndMessages(null);
             totalTimeTv.setVisibility(GONE);
             videoTimeTv.setText("Skip Ads");
             videoTimeTv.setOnClickListener(PlayInView.this);
@@ -139,7 +154,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             playListener.onPlayClose();
         } else if (cId == R.id.downloadTv) {
             goDownload();
-        } else if (cId == R.id.appInfoView) {
+        } else if (cId == R.id.infoDialog) {
             hidMenuInfo();
         } else if (cId == R.id.menuLayout) {
             showMenuInfo();
@@ -171,8 +186,10 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void initView(PlayInfo playInfo) {
-        appInfoView = findViewById(R.id.appInfoView);
-        appInfoView.setOnClickListener(this);
+        findViewById(R.id.infoView).setVisibility(this.showView ? VISIBLE : GONE);
+
+        infoDialog = findViewById(R.id.infoDialog);
+        infoDialog.setOnClickListener(this);
         videoTimeTv = findViewById(R.id.videoTimeTv);
         totalTimeTv = findViewById(R.id.totlalTimeTv);
 
@@ -189,16 +206,17 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
     // 加载声音控制
     private void initVoiceView() {
+        if (null == playInfo) return;
         final GameView gameView = findViewById(R.id.gameview);
-        gameView.setAudioState(audioOn);
+        gameView.setAudioState(audioOpen);
 
         ToggleButton voiceTb = findViewById(R.id.audioTb);
         voiceTb.setVisibility(View.VISIBLE);
-        voiceTb.setChecked(audioOn);
+        voiceTb.setChecked(audioOpen);
         voiceTb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                PlayInView.this.audioOn = isChecked;
+                PlayInView.this.audioOpen = isChecked;
                 gameView.setAudioState(isChecked);
             }
         });
@@ -251,12 +269,12 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         GameView gameView = findViewById(R.id.gameview);
         gameView.startConnect(playInfo, PlayInView.this);
 
-        setScreenOrientation(playInfo);
+        setScreenOrientation();
         adapterGameSize();
     }
 
-    private void setScreenOrientation(PlayInfo playInfo) {
-        if (!autoRotate) return;
+    private void setScreenOrientation() {
+        if (playInfo == null || !autoRotate) return;
         try {
             Activity curActivity = (Activity) getContext();
             if (playInfo.getOrientation() == 0) {
@@ -272,7 +290,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     }
 
     private void adapterGameSize() {
-        if (playInfo == null) return;
+        if (playInfo == null || isFinish) return;
         GameView gameView = findViewById(R.id.gameview);
         if (getWidth() != 0 && getHeight() != 0) {
             int srcWidth = playInfo.getDeviceWidth();
@@ -303,16 +321,28 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private void goDownload() {
         reportDownload();
         String downloadUrl = playInfo.getGoogleplayUrl();
-        playListener.onPlayDownload(downloadUrl);
+        playListener.onPlayInstall(downloadUrl);
+    }
+
+    // 激励视频倒计时
+    private void countVideoTime() {
+        if (videoTime <= 0) {
+            videoTimeTv.setText("Skip Ads");
+            videoTimeTv.setOnClickListener(this);
+            return;
+        }
+        videoTime--;
+        videoTimeTv.setText("Skip Ads ( " + videoTime + " )");
+        getHandler().postDelayed(videoTimeRunnable, 1000);
     }
 
     private Runnable videoTimeRunnable = new Runnable() {
         @Override
         public void run() {
             if (null == videoTimeTv) return;
-            videoTimeTv.setText("Skip Ads ( " + videoTime + " )");
             videoTime--;
-            if (videoTime >= 0) {
+            videoTimeTv.setText("Skip Ads ( " + videoTime + " )");
+            if (videoTime > 0) {
                 getHandler().postDelayed(this, 1000);
             } else {
                 videoTimeTv.setText("Skip Ads");
@@ -323,29 +353,20 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         }
     };
 
-    // 激励视频倒计时
-    private void countVideoTime() {
-        if (videoTime <= 0) {
-            videoTimeTv.setText("Skip Ads");
-            videoTimeTv.setOnClickListener(this);
-            return;
-        }
-        videoTimeTv.setText("Skip Ads ( " + videoTime + " )");
-        getHandler().postDelayed(videoTimeRunnable, 1000);
-    }
-
     // 总试玩时长倒计时
     private void countTotalTime() {
+        totalTime--;
         totalTimeTv.setText(totalTime + "s | ");
         getHandler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                totalTimeTv.setText(totalTime + "s | ");
                 totalTime--;
-                if (totalTime >= 0) {
+                totalTimeTv.setText(totalTime + "s | ");
+                if (totalTime > 0) {
                     getHandler().postDelayed(this, 1000);
                 } else {
                     totalTimeTv.setVisibility(GONE);
+                    playListener.onPlayFinish();
                     reportPlayEnd();
                     showPlayFinish();
                 }
@@ -355,10 +376,10 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
 
     private void showPlayFinish() {
         findViewById(R.id.menuLayout).setVisibility(GONE);          // 隐藏menu
-        appInfoView.setVisibility(VISIBLE);                         // 显示下载弹窗
+        infoDialog.setVisibility(VISIBLE);                          // 显示下载弹窗
         // 时间到不让关闭弹窗
         if (isFinish) {
-            appInfoView.setOnClickListener(null);
+            infoDialog.setOnClickListener(null);
             findViewById(R.id.continueTv).setVisibility(INVISIBLE);
         }
     }
@@ -367,13 +388,13 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         if (findViewById(R.id.menuLayout).getVisibility() == GONE) return;
         findViewById(R.id.menuLayout).setVisibility(GONE);          // 隐藏menu
         Animation anim = AnimationUtils.loadAnimation(getContext(), R.anim.playin_portrait_in);
-        appInfoView.setVisibility(VISIBLE);                         // 显示下载弹窗
-        appInfoView.startAnimation(anim);
+        infoDialog.setVisibility(VISIBLE);                          // 显示下载弹窗
+        infoDialog.startAnimation(anim);
     }
 
     private void hidMenuInfo() {
-        if (appInfoView.getVisibility() == GONE) return;
-        appInfoView.setVisibility(GONE);
+        if (infoDialog.getVisibility() == GONE) return;
+        infoDialog.setVisibility(GONE);
         Animation anim = AnimationUtils.loadAnimation(getContext(), R.anim.playin_portrait_out);
         anim.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -386,7 +407,7 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             @Override
             public void onAnimationRepeat(Animation animation) {}
         });
-        appInfoView.startAnimation(anim);
+        infoDialog.startAnimation(anim);
     }
 
 

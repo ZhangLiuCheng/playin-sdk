@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.tech.playinsdk.PlayInView;
-import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.listener.PlayListener;
 import com.tech.playinsdk.util.PlayLog;
 
@@ -27,12 +26,20 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
 
     private void playGame() {
         PlayInView playView = findViewById(R.id.playView);
-        playView.play(Constants.ADID, 120, false, true, this);
+        playView.play(Constants.ADID, 10,this);
+//        playView.setShowView(true);
+//        playView.setAudioOpen(true);
+//        playView.setAutoRotate(false);
     }
 
     @Override
     public void onPlaystart() {
         hideLoading();
+    }
+
+    @Override
+    public void onPlayFinish() {
+        showDialog("Play finish");
     }
 
     @Override
@@ -42,28 +49,13 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
 
     @Override
     public void onPlayError(Exception ex) {
-        PlayLog.e("onPlayError " + ex);
-
-        if (ex instanceof HttpException) {
-            showErrorDialog(ex.getMessage());
-        }
+        hideLoading();
+        showDialog(ex.getMessage());
     }
 
     @Override
-    public void onPlayDownload(String url) {
-        if (TextUtils.isEmpty(url) || "null".equals(url)) {
-            Toast.makeText(this, "There is no googlePlay download url", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        try {
-            Uri uri = Uri.parse(url);
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            startActivity(intent);
-            finish();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PlayLog.e("download app error：" + ex);
-        }
+    public void onPlayInstall(String url) {
+        downloadApp(url);
     }
 
     @Override
@@ -80,11 +72,10 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
         });
     }
 
-    private void showErrorDialog(String title) {
+    private void showDialog(String message) {
         if (isFinishing()) return;
         AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage("Exception, click confirm to return")
+                .setMessage(message + ", click confirm to return")
                 .setPositiveButton("confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -93,5 +84,21 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
                 }).create();
         dialog.setCancelable(false);
         dialog.show();
+    }
+
+    private void downloadApp(String url) {
+        if (TextUtils.isEmpty(url) || "null".equals(url)) {
+            Toast.makeText(this, "There is no googlePlay download url", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            Uri uri = Uri.parse(url);
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+            finish();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            PlayLog.e("download app error：" + ex);
+        }
     }
 }

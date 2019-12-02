@@ -19,6 +19,9 @@ import com.tech.playinsdk.model.entity.PlayInfo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.SocketException;
+
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, VideoDecoder.DecoderListener {
 
@@ -193,7 +196,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
         @Override
         public void onOpen() {
-            PlayLog.v("MyPlaySocket --> onMessage  onOpen " + playInfo.getOsType());
+            PlayLog.v("MyPlaySocket --> onMessage  onOpen ");
             sendUserContect();
 //            if (playInfo.getOsType() == 2) {
                 sendMessageToAndroid();
@@ -248,7 +251,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         @Override
         public void onError(Exception ex) {
             PlayLog.v("MyPlaySocket --> onError  " + ex);
-            invokeGameError(ex);
+            String msg = "Unknown exception";
+            if (ex instanceof IOException) {
+                msg = "Stream terminal";
+            } else if (ex instanceof SocketException) {
+                msg = "Socket connect exception";
+            }
+            invokeGameError(new Exception(msg));
         }
     }
 

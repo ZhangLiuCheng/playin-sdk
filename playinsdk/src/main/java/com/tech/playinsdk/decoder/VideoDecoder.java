@@ -3,8 +3,6 @@ package com.tech.playinsdk.decoder;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import com.tech.playinsdk.util.PlayLog;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
