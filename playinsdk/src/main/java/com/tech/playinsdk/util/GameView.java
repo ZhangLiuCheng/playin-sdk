@@ -3,7 +3,9 @@ package com.tech.playinsdk.util;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.media.AudioFormat;
+import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -12,6 +14,7 @@ import android.view.SurfaceView;
 import com.tech.playinsdk.connect.PlaySocket;
 import com.tech.playinsdk.decoder.AudioDecoder;
 import com.tech.playinsdk.decoder.FFmpegDecoder;
+import com.tech.playinsdk.decoder.MediaDecoder;
 import com.tech.playinsdk.decoder.VideoDecoder;
 import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.model.entity.PlayInfo;
@@ -69,17 +72,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         initVideoDecoder();
     }
 
-    /**
-     * 设置视频清晰度
-     * @param quality
-     */
+    public void disconnect() {
+        try {
+            if (null != playSocket) playSocket.disConnect();
+            if (null != videodecoder) videodecoder.stop();
+            if (null != audioDecoder) audioDecoder.stop();
+        } catch (Exception ex) {
+            PlayLog.e("GameView disconnect  exception :" + ex);
+        }
+    }
+
+
     public void sendVideoQuality(int quality) {
         try {
             JSONObject obj = new JSONObject();
             obj.put("video_quality", quality);
             playSocket.sendStream(Constants.PacketType.STREAM, Constants.StreamType.PARAMS, obj.toString());
         } catch (Exception ex) {
-            PlayLog.e("sendVideoQuality  exception :" + ex);
+            PlayLog.e("GameView sendVideoQuality  exception :" + ex);
         }
     }
 
@@ -88,6 +98,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         audioDecoder.start();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void initVideoDecoder() {
         int width = playInfo.getDeviceWidth();
         int height = playInfo.getDeviceHeight();
@@ -104,6 +115,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
             }
         }
         videodecoder = new FFmpegDecoder(width, height, rotate);
+//        videodecoder = new MediaDecoder(width, height, rotate);
         videodecoder.setDecoderListener(this);
         videodecoder.start();
     }
@@ -198,9 +210,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         public void onOpen() {
             PlayLog.v("MyPlaySocket --> onMessage  onOpen ");
             sendUserContect();
-//            if (playInfo.getOsType() == 2) {
-                sendMessageToAndroid();
-//            }
+            sendMessageToAndroid();
         }
 
         @Override

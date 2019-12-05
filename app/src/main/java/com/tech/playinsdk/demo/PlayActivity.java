@@ -2,13 +2,12 @@ package com.tech.playinsdk.demo;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+import android.widget.ToggleButton;
 
 import com.tech.playinsdk.PlayInView;
 import com.tech.playinsdk.listener.PlayListener;
@@ -20,61 +19,54 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
-        getSupportActionBar().hide();
         playGame();
+        initView();
+    }
+
+    private void initView() {
+        ToggleButton switcher = findViewById(R.id.toggle);
+        switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                PlayInView playView = findViewById(R.id.playView);
+                playView.setAudioState(isChecked);
+            }
+        });
     }
 
     private void playGame() {
         PlayInView playView = findViewById(R.id.playView);
-        playView.play(Constants.ADID, 10,this);
-        playView.setShowView(true);
-//        playView.setAudioOpen(true);
+        playView.play(Constants.ADID, this);
+//        playView.setAudioState(true);
 //        playView.setAutoRotate(false);
+    }
+
+    public void finshGame(View view) {
+        PlayInView playView = findViewById(R.id.playView);
+        playView.finish();
     }
 
     @Override
     public void onPlaystart() {
         hideLoading();
+        PlayLog.e("onPlaystart");
     }
 
     @Override
     public void onPlayFinish() {
-        showDialog("Play finish");
-    }
-
-    @Override
-    public void onPlayClose() {
+        PlayLog.e("onPlayFinish");
         finish();
     }
 
     @Override
     public void onPlayError(Exception ex) {
+        PlayLog.e("onPlayFinish " + ex.toString());
         hideLoading();
         showDialog(ex.getMessage());
     }
 
-    @Override
-    public void onPlayTime(int count) {
-
-    }
-
-    @Override
-    public void onPlayInstall(String url) {
-        downloadApp(url);
-    }
-
-    @Override
-    public void onPlayForceTime() {
-        PlayLog.e("强制试玩时间结束");
-    }
-
     private void hideLoading() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                findViewById(R.id.loading).setVisibility(View.GONE);
-            }
-        });
+        findViewById(R.id.loading).setVisibility(View.GONE);
     }
 
     private void showDialog(String message) {
@@ -89,21 +81,5 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
                 }).create();
         dialog.setCancelable(false);
         dialog.show();
-    }
-
-    private void downloadApp(String url) {
-        if (TextUtils.isEmpty(url) || "null".equals(url)) {
-            Toast.makeText(this, "There is no googlePlay download url", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        try {
-            Uri uri = Uri.parse(url);
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            startActivity(intent);
-            finish();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PlayLog.e("download app error：" + ex);
-        }
     }
 }

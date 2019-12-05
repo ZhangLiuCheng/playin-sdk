@@ -59,11 +59,11 @@ public class MediaDecoder extends VideoDecoder {
             } else {
                 mediaCodec.queueInputBuffer(inputBufferIndex, 0, length, 0, 0);
             }
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(20);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
         }
         int outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, 100);
         while (outputBufferIndex >= 0) {
