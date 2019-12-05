@@ -225,6 +225,10 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
     private void initqualityView() {
         final GameView gameView = findViewById(R.id.gameview);
         Spinner spinner = findViewById(R.id.qualitySp);
+        String cpuInfo = android.os.Build.CPU_ABI;
+        if ("arm64-v8a".equals(cpuInfo)) {
+            spinner.setVisibility(VISIBLE);
+        }
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -332,8 +336,9 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
             return;
         }
         videoTime--;
-        videoTimeTv.setText("Skip Ads ( " + videoTime + " )");
+        videoTimeTv.setText("Exit PlayIN ( " + videoTime + " )");
         getHandler().postDelayed(videoTimeRunnable, 1000);
+        playListener.onPlayTime(videoTime);
     }
 
     private Runnable videoTimeRunnable = new Runnable() {
@@ -341,11 +346,13 @@ public class PlayInView extends FrameLayout implements View.OnClickListener, Gam
         public void run() {
             if (null == videoTimeTv) return;
             videoTime--;
-            videoTimeTv.setText("Skip Ads ( " + videoTime + " )");
+            videoTimeTv.setText("Exit PlayIN ( " + videoTime + " )");
+            playListener.onPlayTime(videoTime);
+
             if (videoTime > 0) {
                 getHandler().postDelayed(this, 1000);
             } else {
-                videoTimeTv.setText("Skip Ads");
+                videoTimeTv.setText("Exit PlayIN");
                 videoTimeTv.setOnClickListener(PlayInView.this);
                 findViewById(R.id.menuLayout).setVisibility(VISIBLE);
                 playListener.onPlayForceTime();

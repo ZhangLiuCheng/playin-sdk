@@ -27,7 +27,7 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
     private void playGame() {
         PlayInView playView = findViewById(R.id.playView);
         playView.play(Constants.ADID, 10,this);
-//        playView.setShowView(true);
+        playView.setShowView(true);
 //        playView.setAudioOpen(true);
 //        playView.setAutoRotate(false);
     }
@@ -51,6 +51,11 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
     public void onPlayError(Exception ex) {
         hideLoading();
         showDialog(ex.getMessage());
+    }
+
+    @Override
+    public void onPlayTime(int count) {
+
     }
 
     @Override

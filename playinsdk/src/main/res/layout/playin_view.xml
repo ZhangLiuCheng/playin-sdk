@@ -191,6 +191,7 @@
                 android:background="#FFFFFF"
                 android:entries="@array/quality"
                 android:gravity="center"
+                android:visibility="gone"
                 android:textAlignment="center"></Spinner>
 
             <ToggleButton
