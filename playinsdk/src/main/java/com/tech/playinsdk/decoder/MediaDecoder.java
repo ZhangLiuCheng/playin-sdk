@@ -1,6 +1,7 @@
 package com.tech.playinsdk.decoder;
 
 import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -24,8 +25,12 @@ public class MediaDecoder extends VideoDecoder {
     @Override
     protected boolean initDecoder(Surface surface) {
         try {
-            MediaFormat format = MediaFormat.createVideoFormat(MIMETYPE_VIDEO_AVC, videoWidth, videoHeight);
-            format.setInteger(MediaFormat.KEY_FRAME_RATE, 20);
+            MediaFormat format = MediaFormat.createVideoFormat(MIMETYPE_VIDEO_AVC, 360, 640);
+
+            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, 6000000);
+            format.setInteger(MediaFormat.KEY_FRAME_RATE, 15);
+            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 60 * 60 * 24 * 100);
 
             byte[] header_sps = {0, 0, 0, 1, 39, 77, 0, 30, -85, 64, -64, 42, -14, -38};
             byte[] header_pps = {0, 0, 0, 1, 40, -18, 60, 48};

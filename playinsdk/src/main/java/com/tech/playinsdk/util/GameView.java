@@ -98,7 +98,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         audioDecoder.start();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void initVideoDecoder() {
         int width = playInfo.getDeviceWidth();
         int height = playInfo.getDeviceHeight();
