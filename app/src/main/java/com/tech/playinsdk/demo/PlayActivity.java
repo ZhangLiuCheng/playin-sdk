@@ -5,8 +5,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
-import android.widget.Switch;
+import android.widget.Spinner;
 import android.widget.ToggleButton;
 
 import com.tech.playinsdk.PlayInView;
@@ -30,6 +31,19 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 PlayInView playView = findViewById(R.id.playView);
                 playView.setAudioState(isChecked);
+            }
+        });
+
+        Spinner quality = findViewById(R.id.quality);
+        quality.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                PlayInView playView = findViewById(R.id.playView);
+                playView.setVideoQuality((int)(id + 1));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
     }

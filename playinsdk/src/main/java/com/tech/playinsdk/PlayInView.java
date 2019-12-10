@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import com.tech.playinsdk.listener.PlayListener;
 import com.tech.playinsdk.model.entity.PlayInfo;
 import com.tech.playinsdk.util.Constants;
 import com.tech.playinsdk.util.GameView;
+import com.tech.playinsdk.util.PlayLog;
 
 public class PlayInView extends FrameLayout implements GameView.GameListener {
 
@@ -94,7 +96,8 @@ public class PlayInView extends FrameLayout implements GameView.GameListener {
     }
 
     private void requestPlayInfo(String adid) {
-        PlayInSdk.getInstance().userActions(adid, new HttpListener<PlayInfo>() {
+        String androidId = Settings.System.getString(getContext().getContentResolver(), Settings.System.ANDROID_ID);
+        PlayInSdk.getInstance().userActions(adid, androidId, new HttpListener<PlayInfo>() {
             @Override
             public void success(PlayInfo result) {
                 if (isDetached) return;
@@ -109,7 +112,6 @@ public class PlayInView extends FrameLayout implements GameView.GameListener {
             }
         });
     }
-
 
     private void connectPlayIn(PlayInfo playInfo) {
         totalTime = playInfo.getDuration();
