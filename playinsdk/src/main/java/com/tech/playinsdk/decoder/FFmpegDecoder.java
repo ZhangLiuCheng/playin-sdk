@@ -36,14 +36,15 @@ public class FFmpegDecoder extends VideoDecoder {
             return;
         }
         if (init) {
-            long start = System.currentTimeMillis();
+//            PlayLog.e("start =========== ");
+//            long start = System.currentTimeMillis();
             ffmpegDecoding(buf);
-            long end = System.currentTimeMillis();
-            long time = end - start;
-            PlayLog.i("解码用时: " + time);
-            if (time > 20) {
-                PlayLog.i("===========>   解码用时: " + time);
-            }
+//            long end = System.currentTimeMillis();
+//            long time = end - start;
+//            PlayLog.e("end ------------ 总渲染用时: " + time);
+//            if (time > 20) {
+//                PlayLog.e("===========>   解码用时: " + time);
+//            }
         }
     }
 
