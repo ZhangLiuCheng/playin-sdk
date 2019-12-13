@@ -25,11 +25,6 @@ int FFmpeg::init(JNIEnv *env, jobject instance, jint width, jint height, jint ro
 
     av_register_all();
     pCodec = avcodec_find_decoder(AV_CODEC_ID_H264);
-
-//    pCodec = avcodec_find_decoder_by_name("h264_mediacodec");
-//    const char* config = avcodec_configuration();
-//    LOGE("========> %s", config);
-
     if (pCodec == NULL) {
         LOGE("%s","无法解码");
         return -1;

@@ -42,9 +42,6 @@ public class FFmpegDecoder extends VideoDecoder {
 //            long end = System.currentTimeMillis();
 //            long time = end - start;
 //            PlayLog.e("end ------------ 总渲染用时: " + time);
-//            if (time > 20) {
-//                PlayLog.e("===========>   解码用时: " + time);
-//            }
         }
     }
 
