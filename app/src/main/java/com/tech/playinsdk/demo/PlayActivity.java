@@ -61,20 +61,20 @@ public class PlayActivity extends AppCompatActivity implements PlayListener {
     }
 
     @Override
-    public void onPlaystart() {
+    public void onPlayStart(int duration) {
         hideLoading();
-        PlayLog.e("onPlaystart");
+        PlayLog.e("onPlayStart");
     }
 
     @Override
-    public void onPlayFinish() {
-        PlayLog.e("onPlayFinish");
+    public void onPlayEnd(boolean manual) {
+        PlayLog.e("onPlayEnd");
         finish();
     }
 
     @Override
     public void onPlayError(Exception ex) {
-        PlayLog.e("onPlayFinish " + ex.toString());
+        PlayLog.e("onPlayEnd " + ex.toString());
         hideLoading();
         showDialog(ex.getMessage());
     }

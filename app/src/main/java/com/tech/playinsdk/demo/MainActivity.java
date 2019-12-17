@@ -27,17 +27,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initData();
 
 //        PlayInSdk.getInstance().setTest(true);
-
-        String nativeLibraryDir = getApplicationInfo().nativeLibraryDir;
-        PlayLog.e("nativeLibraryDir  ===> " + nativeLibraryDir);
-
-
-        PlayLog.e("CPU_ABI  ===> " + Build.CPU_ABI);
-
-        String[] cpuInfo = android.os.Build.SUPPORTED_ABIS;
-        for (int i = 0; i < cpuInfo.length; i++) {
-            PlayLog.e("SUPPORTED_ABIS  ===> " + cpuInfo[i]);
-        }
     }
 
     private void initData() {

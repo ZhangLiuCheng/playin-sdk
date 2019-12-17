@@ -12,6 +12,7 @@ import android.view.SurfaceView;
 import com.tech.playinsdk.connect.PlaySocket;
 import com.tech.playinsdk.decoder.AudioDecoder;
 import com.tech.playinsdk.decoder.FFmpegDecoder;
+import com.tech.playinsdk.decoder.MediaDecoder;
 import com.tech.playinsdk.decoder.VideoDecoder;
 import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.model.entity.PlayInfo;

@@ -2,8 +2,6 @@ package com.tech.playinsdk.decoder;
 
 import android.view.Surface;
 
-import com.tech.playinsdk.util.PlayLog;
-
 public class FFmpegDecoder extends VideoDecoder {
 
     static {
@@ -36,12 +34,7 @@ public class FFmpegDecoder extends VideoDecoder {
             return;
         }
         if (init) {
-//            PlayLog.e("start =========== ");
-//            long start = System.currentTimeMillis();
             ffmpegDecoding(buf);
-//            long end = System.currentTimeMillis();
-//            long time = end - start;
-//            PlayLog.e("end ------------ 总渲染用时: " + time);
         }
     }
 

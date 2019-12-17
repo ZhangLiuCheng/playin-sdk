@@ -17,7 +17,6 @@ import com.tech.playinsdk.listener.PlayListener;
 import com.tech.playinsdk.model.entity.PlayInfo;
 import com.tech.playinsdk.util.Constants;
 import com.tech.playinsdk.util.GameView;
-import com.tech.playinsdk.util.PlayLog;
 
 public class PlayInView extends FrameLayout implements GameView.GameListener {
 
@@ -69,7 +68,7 @@ public class PlayInView extends FrameLayout implements GameView.GameListener {
     }
 
     public void finish() {
-        playListener.onPlayFinish();
+        playListener.onPlayEnd(true);
         playEnd();
     }
 
@@ -174,7 +173,7 @@ public class PlayInView extends FrameLayout implements GameView.GameListener {
                 if (totalTime > 0) {
                     getHandler().postDelayed(this, 1000);
                 } else {
-                    playListener.onPlayFinish();
+                    playListener.onPlayEnd(false);
                     playEnd();
                 }
             }
@@ -198,7 +197,7 @@ public class PlayInView extends FrameLayout implements GameView.GameListener {
 
     @Override
     public void onGameStart() {
-        playListener.onPlaystart();
+        playListener.onPlayStart(playInfo.getDuration());
         countTotalTime();
     }
 
