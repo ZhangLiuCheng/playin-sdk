@@ -12,14 +12,12 @@ import android.view.SurfaceView;
 import com.tech.playinsdk.connect.PlaySocket;
 import com.tech.playinsdk.decoder.AudioDecoder;
 import com.tech.playinsdk.decoder.FFmpegDecoder;
-import com.tech.playinsdk.decoder.MediaDecoder;
 import com.tech.playinsdk.decoder.VideoDecoder;
 import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.model.entity.PlayInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.net.SocketException;
 
@@ -77,19 +75,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
             if (null != audioDecoder) audioDecoder.stop();
         } catch (Exception ex) {
             PlayLog.e("GameView disconnect  exception :" + ex);
-        }
-    }
-
-
-    public void sendVideoQuality(int quality) {
-        PlayLog.e("setVideoQuality  " + quality);
-
-        try {
-            JSONObject obj = new JSONObject();
-            obj.put("video_quality", quality);
-            playSocket.sendStream(Constants.PacketType.STREAM, Constants.StreamType.PARAMS, obj.toString());
-        } catch (Exception ex) {
-            PlayLog.e("GameView sendVideoQuality  exception :" + ex);
         }
     }
 
@@ -172,31 +157,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         return true;
     }
 
-    private void sendUserContect() {
-        try {
-            JSONObject obj = new JSONObject();
-            obj.put("token", playInfo.getToken());
-            obj.put("device_name", android.os.Build.BRAND);
-            obj.put("os_type", Constants.OS_TYPE);
-            obj.put("coder", "annex-b");  // 安卓annex-b, 苹果avcc
-            playSocket.sendText(obj.toString());
-        } catch (Exception ex) {
-            PlayLog.e("sendUserContect  exception :" + ex);
-        }
-    }
-
-    private void sendMessageToAndroid() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                    playSocket.sendStream(Constants.PacketType.STREAM, Constants.StreamType.ANDROID_VIDEO_START, "");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+    public void changeVideoQuality(int quality) {
+        PlayLog.e("changeVideoQuality  " + quality);
+        playSocket.sendVideoQuality(quality);
     }
 
     private class MyPlaySocket extends PlaySocket {
@@ -208,8 +171,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         @Override
         public void onOpen() {
             PlayLog.v("MyPlaySocket --> onMessage  onOpen ");
-            sendUserContect();
-            sendMessageToAndroid();
+            sendUserInfo(playInfo.getToken());
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(2000);
+                        sendMessageToAndroid();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
 
         @Override
@@ -247,7 +220,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
         @Override
         public void onMessage(int streamType, byte[] buf) {
-//            PlayLog.e("onMessage  " + streamType + " ====  " + buf.length);
+//            PlayLog.e("MyPlaySocket --> onMessage  " + streamType + " ====  " + buf.length);
             if (GameView.this.visibility == 0) {
                 if (streamType == Constants.StreamType.H264) {
                     if (null != videodecoder) videodecoder.sendVideoData(buf);

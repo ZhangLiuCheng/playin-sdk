@@ -8,6 +8,7 @@ import com.tech.playinsdk.model.ApiService;
 import com.tech.playinsdk.model.entity.Advert;
 import com.tech.playinsdk.model.entity.Config;
 import com.tech.playinsdk.model.entity.PlayInfo;
+import com.tech.playinsdk.util.Analyze;
 import com.tech.playinsdk.util.Constants;
 import com.tech.playinsdk.util.PlayLog;
 
@@ -89,6 +90,7 @@ public class PlayInSdk {
      */
     public void userActions(String adId, String deviceId, final HttpListener<PlayInfo> httpListener) {
         ApiService.userActionsPlay(getApiHost(), adId, sdkKey, deviceId, httpListener);
+        Analyze.getInstance().reset();
     }
 
     /**
@@ -106,6 +108,7 @@ public class PlayInSdk {
      */
     public void report(String token, String action) {
         ApiService.report(getApiHost(), token, action);
+        Analyze.getInstance().report(token);
     }
 
     private void setHttpHelperSessionKey(String sessionKey) {

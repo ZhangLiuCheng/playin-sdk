@@ -77,7 +77,7 @@ public class PlayInView extends FrameLayout implements GameView.GameListener {
      * @param quality
      */
     public void setVideoQuality(int quality) {
-        if (null != gameView) gameView.sendVideoQuality(quality);
+        if (null != gameView) gameView.changeVideoQuality(quality);
     }
 
     /**
