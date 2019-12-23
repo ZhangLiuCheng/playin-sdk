@@ -1,5 +1,6 @@
 package com.tech.playinsdk.util;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Analyze {
@@ -27,14 +28,13 @@ public class Analyze {
 
     public JSONObject report() {
         JSONObject obj = new JSONObject();
-        PlayLog.e("sendTotal: " + sendTotal);
-        PlayLog.e("sendFail: " + sendFail);
-        PlayLog.e("recvVideoTotal: " + recvVideoTotal);
-        PlayLog.e("recvVideoFail: " + recvVideoFail);
-        PlayLog.e("vd_0_50: " + vd_0_50);
-        PlayLog.e("vd_50_100: " + vd_50_100);
-        PlayLog.e("vd_100_150: " + vd_100_150);
-        PlayLog.e("vd_150_max: " + vd_150_max);
+        try {
+            obj.put("recvStatus", recvVideoTotal + "-" + recvVideoFail);
+            obj.put("sendStatus", sendTotal + "-" + sendFail);
+            obj.put("vdStatus", vd_0_50 + "-" + vd_50_100 + "-" + vd_100_150 + "-" + vd_150_max);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return obj;
     }
 

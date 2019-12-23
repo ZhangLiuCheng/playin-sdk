@@ -157,7 +157,7 @@ public class ApiService {
         params.put("token", token);
         params.put("event_name", "android_sdk");
         params.put("data", data);
-        HttpHelper.obtian().doPost(host + "/analytics", params,
+        HttpHelper.obtian().doPost(host + "/analytics/event", params,
                 new HttpListener<JSONObject>() {
                     @Override
                     public void success(JSONObject result) {
