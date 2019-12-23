@@ -1,5 +1,7 @@
 package com.tech.playinsdk;
 
+import android.os.Build;
+
 import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.http.HttpHelper;
 import com.tech.playinsdk.listener.HttpListener;
@@ -11,6 +13,9 @@ import com.tech.playinsdk.model.entity.PlayInfo;
 import com.tech.playinsdk.util.Analyze;
 import com.tech.playinsdk.util.Constants;
 import com.tech.playinsdk.util.PlayLog;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -108,7 +113,15 @@ public class PlayInSdk {
      */
     public void report(String token, String action) {
         ApiService.report(getApiHost(), token, action);
-        Analyze.getInstance().report(token);
+        try {
+            JSONObject analyzeData = Analyze.getInstance().report();
+            analyzeData.put("phone", Build.BRAND + "-" + Build.MODEL);
+            analyzeData.put("version", Build.VERSION.RELEASE);
+            PlayLog.e("analyzeData =============>  " + analyzeData.toString());
+            ApiService.analyze(getApiHost(), token, analyzeData.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setHttpHelperSessionKey(String sessionKey) {

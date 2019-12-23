@@ -16,7 +16,6 @@ import com.tech.playinsdk.decoder.VideoDecoder;
 import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.model.entity.PlayInfo;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.net.SocketException;
@@ -36,6 +35,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     private GameListener playListener;
     private PlayInfo playInfo;
     private PlaySocket playSocket;
+    private int retryCount;
     private int visibility;
     private boolean audioOn = true;
 
@@ -62,10 +62,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     public void startConnect(PlayInfo playInfo, GameListener listener) {
         this.playInfo = playInfo;
         this.playListener = listener;
-        playSocket = new MyPlaySocket(playInfo.getServerIp(), playInfo.getServerPort());
-        playSocket.connect();
         initAudioDecoder();
         initVideoDecoder();
+        connectSocket();
+    }
+
+    private void connectSocket() {
+        if (null != playSocket) {
+            playSocket.disConnect();
+        }
+        playSocket = new MyPlaySocket(playInfo.getServerIp(), playInfo.getServerPort());
+        playSocket.connect();
     }
 
     public void disconnect() {
@@ -190,10 +197,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
             PlayLog.v("MyPlaySocket --> onMessage  msg " + msg);
             try {
                 JSONObject object = new JSONObject(msg);
-                if (0 != object.optInt("code")) {
-                    invokeGameError(new HttpException(-1, object.optString("error")));
+                int code = object.optInt("code");
+                if (0 != code) {
+                    // 安卓设备，code=18继续重连
+                    if (isAttachedToWindow() && playInfo.getOsType() == 2 && retryCount < 5 && code == -18) {
+                        retryCount++;
+                        Thread.sleep(1600);
+                        connectSocket();
+                    } else {
+                        invokeGameError(new HttpException(code, object.optString("error")));
+                    }
+                    return;
                 }
-
                 // ios 默认音频参数
                 int sampleRateInHz = 22050;
                 int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
@@ -213,7 +228,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
                     else if (bps == 8) audioFormat = AudioFormat.ENCODING_PCM_8BIT;
                 }
                 audioDecoder.initAudioTrack(sampleRateInHz, channelConfig, audioFormat);
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

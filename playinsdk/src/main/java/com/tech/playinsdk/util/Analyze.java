@@ -1,5 +1,7 @@
 package com.tech.playinsdk.util;
 
+import org.json.JSONObject;
+
 public class Analyze {
 
     private static class AnalyzeClassInstance {
@@ -17,23 +19,51 @@ public class Analyze {
         sendFail = 0;
         recvVideoTotal = 0;
         recvVideoFail = 0;
+        vd_0_50 = 0;
+        vd_50_100 = 0;
+        vd_100_150 = 0;
+        vd_150_max = 0;
     }
 
-    public void report(String token) {
+    public JSONObject report() {
+        JSONObject obj = new JSONObject();
         PlayLog.e("sendTotal: " + sendTotal);
         PlayLog.e("sendFail: " + sendFail);
         PlayLog.e("recvVideoTotal: " + recvVideoTotal);
         PlayLog.e("recvVideoFail: " + recvVideoFail);
+        PlayLog.e("vd_0_50: " + vd_0_50);
+        PlayLog.e("vd_50_100: " + vd_50_100);
+        PlayLog.e("vd_100_150: " + vd_100_150);
+        PlayLog.e("vd_150_max: " + vd_150_max);
+        return obj;
     }
 
+    // 解码统计
+    private int vd_0_50 = 0;
+    private int vd_50_100 = 0;
+    private int vd_100_150 = 0;
+    private int vd_150_max = 0;
+    public void videoDecoder(int duration) {
+        if (duration < 50) {
+            vd_0_50++;
+        } else if (duration < 100) {
+            vd_50_100++;
+        } else if (duration < 150) {
+            vd_100_150++;
+        } else {
+            vd_150_max++;
+        }
+    }
+
+    // 发送触控数据统计
     private long sendTotal = 0;
     private long sendFail = 0;
-
     public void sendResult(boolean reslut) {
         sendTotal++;
         if (!reslut) sendFail++;
     }
 
+    // 接受视频数据统计
     private long recvVideoTotal = 0;
     private long recvVideoFail = 0;
     public void receiveVideoResult(boolean reslut) {

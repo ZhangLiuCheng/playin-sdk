@@ -2,7 +2,7 @@ package com.tech.playinsdk.decoder;
 
 import android.view.Surface;
 
-import com.tech.playinsdk.util.PlayLog;
+import com.tech.playinsdk.util.Analyze;
 
 public class FFmpegDecoder extends VideoDecoder {
 
@@ -36,14 +36,11 @@ public class FFmpegDecoder extends VideoDecoder {
             return;
         }
         if (init) {
-//            ffmpegDecoding(buf);
-//            PlayLog.e("start =========== ");
-//            long start = System.currentTimeMillis();
+            long start = System.currentTimeMillis();
             ffmpegDecoding(buf);
-//            long end = System.currentTimeMillis();
-//            long time = end - start;
-//            PlayLog.e("end ------------ 总渲染用时: " + time);
-//            PlayLog.e(" ------------ 解码渲染用时: " + time);
+            long end = System.currentTimeMillis();
+            int duration = (int) (end - start);
+            Analyze.getInstance().videoDecoder(duration);
         }
     }
 
