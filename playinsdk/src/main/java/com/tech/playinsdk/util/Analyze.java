@@ -1,5 +1,7 @@
 package com.tech.playinsdk.util;
 
+import android.text.TextUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,6 +26,7 @@ public class Analyze {
         vd_50_100 = 0;
         vd_100_150 = 0;
         vd_150_max = 0;
+        errMsg = null;
     }
 
     public JSONObject report() {
@@ -32,6 +35,9 @@ public class Analyze {
             obj.put("recvStatus", recvVideoTotal + "-" + recvVideoFail);
             obj.put("sendStatus", sendTotal + "-" + sendFail);
             obj.put("vdStatus", vd_0_50 + "-" + vd_50_100 + "-" + vd_100_150 + "-" + vd_150_max);
+            if (!TextUtils.isEmpty(errMsg)) {
+                obj.put("errMsg", errMsg);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -69,5 +75,10 @@ public class Analyze {
     public void receiveVideoResult(boolean reslut) {
         recvVideoTotal++;
         if (!reslut) recvVideoFail++;
+    }
+
+    private String errMsg;
+    public void playError(Exception ex) {
+        errMsg = ex.toString();
     }
 }

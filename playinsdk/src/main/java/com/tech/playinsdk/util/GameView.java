@@ -200,7 +200,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
                 int code = object.optInt("code");
                 if (0 != code) {
                     // 安卓设备，code=18继续重连
-                    if (isAttachedToWindow() && playInfo.getOsType() == 2 && retryCount < 5 && code == -18) {
+                    if (isAttachedToWindow() && playInfo.getOsType() == 2 && retryCount < 6 && code == -18) {
                         retryCount++;
                         Thread.sleep(1600);
                         connectSocket();
