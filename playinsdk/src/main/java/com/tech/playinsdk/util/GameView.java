@@ -207,27 +207,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
                     } else {
                         invokeGameError(new HttpException(code, object.optString("error")));
                     }
-                    return;
+                } else {
+                    parserAudioConfig(object);
                 }
-                // ios 默认音频参数
-                int sampleRateInHz = 22050;
-                int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-                int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-                if (playInfo.getOsType() == 2) {
-                    // android 默认音频参数
-                    sampleRateInHz = 24000;
-                    channelConfig = 3;
-                    audioFormat = 2;
-                }
-                JSONObject streamInfo = object.optJSONObject("stream_info");
-                if (null != streamInfo) {
-                    sampleRateInHz = streamInfo.optInt("sample_rate");
-                    channelConfig = streamInfo.optInt("channels");
-                    int bps = streamInfo.optInt("bits_per_sample");
-                    if (bps == 16) audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-                    else if (bps == 8) audioFormat = AudioFormat.ENCODING_PCM_8BIT;
-                }
-                audioDecoder.initAudioTrack(sampleRateInHz, channelConfig, audioFormat);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -261,6 +243,32 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
     @Override
     public void decoderSuccess() {
         invokeGameStart();
+    }
+
+    private void parserAudioConfig(JSONObject object) {
+        int sampleRateInHz, channelConfig, audioFormat;
+
+        if (playInfo.getOsType() == 1) {
+            // ios 默认音频参数
+            sampleRateInHz = 22050;
+            channelConfig = AudioFormat.CHANNEL_IN_MONO;
+            audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+        } else {
+            // android 默认音频参数
+            sampleRateInHz = 48000;
+            channelConfig = AudioFormat.CHANNEL_IN_STEREO;
+            audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+        }
+        // 如果流里面有音频参数，以流里面为准
+        JSONObject streamInfo = object.optJSONObject("stream_info");
+        if (null != streamInfo) {
+            sampleRateInHz = streamInfo.optInt("sample_rate");
+            channelConfig = streamInfo.optInt("channels");
+            int bps = streamInfo.optInt("bits_per_sample");
+            if (bps == 16) audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+            else if (bps == 8) audioFormat = AudioFormat.ENCODING_PCM_8BIT;
+        }
+        audioDecoder.initAudioTrack(sampleRateInHz, channelConfig, audioFormat);
     }
 
     private void invokeGameStart() {

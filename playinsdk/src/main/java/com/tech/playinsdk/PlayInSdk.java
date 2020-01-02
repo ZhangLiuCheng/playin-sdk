@@ -14,7 +14,6 @@ import com.tech.playinsdk.util.Analyze;
 import com.tech.playinsdk.util.Constants;
 import com.tech.playinsdk.util.PlayLog;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
