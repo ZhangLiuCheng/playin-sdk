@@ -32,9 +32,19 @@ public class Analyze {
     public JSONObject report() {
         JSONObject obj = new JSONObject();
         try {
-            obj.put("recvStatus", recvVideoTotal + "-" + recvVideoFail);
-            obj.put("sendStatus", sendTotal + "-" + sendFail);
-            obj.put("vdStatus", vd_0_50 + "-" + vd_50_100 + "-" + vd_100_150 + "-" + vd_150_max);
+//            obj.put("recvStatus", recvVideoTotal + "-" + recvVideoFail);
+//            obj.put("sendStatus", sendTotal + "-" + sendFail);
+//            obj.put("vdStatus", vd_0_50 + "-" + vd_50_100 + "-" + vd_100_150 + "-" + vd_150_max);
+
+            obj.put("recvSucc", recvVideoTotal);
+            obj.put("recvFail", recvVideoFail);
+            obj.put("sendSucc", sendTotal);
+            obj.put("sendFail", sendFail);
+            obj.put("vd1", vd_0_50);
+            obj.put("vd2", vd_50_100);
+            obj.put("vd3", vd_100_150);
+            obj.put("vd4", vd_150_max);
+
             if (!TextUtils.isEmpty(errMsg)) {
                 obj.put("errMsg", errMsg);
             }
