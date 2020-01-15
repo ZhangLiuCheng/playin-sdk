@@ -178,6 +178,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         @Override
         public void onOpen() {
             PlayLog.v("MyPlaySocket --> onMessage  onOpen ");
+            Analyze.getInstance().setConnectStatus();
+
             sendUserInfo(playInfo.getToken());
             new Thread(new Runnable() {
                 @Override

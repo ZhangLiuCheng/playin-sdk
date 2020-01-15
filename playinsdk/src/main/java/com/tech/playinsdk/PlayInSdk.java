@@ -111,12 +111,13 @@ public class PlayInSdk {
      * @param action
      */
     public void report(String token, String action) {
-        ApiService.report(getApiHost(), token, action);
+        String idrCount = Analyze.getInstance().getPlayStatus() + "";
+        ApiService.report(getApiHost(), token, action, idrCount);
         try {
             JSONObject analyzeData = Analyze.getInstance().report();
             analyzeData.put("phone", Build.BRAND + "-" + Build.MODEL);
             analyzeData.put("version", Build.VERSION.RELEASE);
-//            PlayLog.e("analyzeData =============>  " + analyzeData.toString());
+//            PlayLog.e("analyzeData =============>  " + idrCount + "  ------ " + analyzeData.toString());
             ApiService.analyze(getApiHost(), token, analyzeData.toString());
         } catch (Exception e) {
             e.printStackTrace();

@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Check game can to establishConnection
     private void checkAvailable() {
-        PlayInSdk.getInstance().confirmPlayableAd(Constants.SDK_KEY, new HttpListener<Boolean>() {
+        PlayInSdk.getInstance().confirmPlayableAd(Constants.ADID, new HttpListener<Boolean>() {
             @Override
             public void success(Boolean result) {
                 mPlay.setVisibility(View.VISIBLE);
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void failure(HttpException e) {
-                Toast.makeText(MainActivity.this, "No equipment to establishConnection with", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "No equipment available", Toast.LENGTH_SHORT).show();
             }
         });
     }

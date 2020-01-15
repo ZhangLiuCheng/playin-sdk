@@ -66,7 +66,7 @@ public class ApiService {
         Map<String, String> params = new HashMap<>();
         params.put("ad_id", adId);
         params.put("os_type", Constants.OS_TYPE);
-        HttpHelper.obtian().doPost(host + "/user/available", params,
+        HttpHelper.obtian().doPost(host + "/user/available/v2", params,
                 new HttpListener<JSONObject>() {
                     @Override
                     public void success(JSONObject result) {
@@ -103,7 +103,7 @@ public class ApiService {
         } catch (Exception ex) {
         }
 
-        HttpHelper.obtian().doPost(host + "/user/actions/play", params,
+        HttpHelper.obtian().doPost(host + "/user/actions/play/v2", params,
                 new HttpListener<JSONObject>() {
                     @Override
                     public void success(JSONObject result) {
@@ -134,10 +134,11 @@ public class ApiService {
                 });
     }
 
-    public static void report(String host, String token, String action) {
+    public static void report(String host, String token, String action, String idr_count) {
         Map<String, String> params = new HashMap<>();
         params.put("token", token);
         params.put("action", action);
+        params.put("idr_count", idr_count);
         HttpHelper.obtian().doPost(host + "/user/report/", params,
                 new HttpListener<JSONObject>() {
                     @Override

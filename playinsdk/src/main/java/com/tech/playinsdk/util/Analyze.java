@@ -30,6 +30,24 @@ public class Analyze {
     }
 
     public JSONObject report() {
+        /*
+        phone		手机型号
+        version	    手机版本
+
+        recvSucc	接收视频总帧数
+        recvFail	丢弃视频帧数
+
+        sendSucc	发送手势总帧数
+        sendFail	丢弃手势帧数
+
+        vd1			解码区间 0_50
+        vd2			解码区间 50_100
+        vd3			解码区间 100_150
+        vd4			解码区间 150_max
+
+        errMsg		错误信息
+        */
+
         JSONObject obj = new JSONObject();
         try {
 //            obj.put("recvStatus", recvVideoTotal + "-" + recvVideoFail);
@@ -85,6 +103,19 @@ public class Analyze {
     public void receiveVideoResult(boolean reslut) {
         recvVideoTotal++;
         if (!reslut) recvVideoFail++;
+    }
+
+
+    // 试玩状态统计
+    private int playStatus = -1;
+    public void setConnectStatus() {
+        playStatus = 0;
+    }
+    public long getPlayStatus() {
+        if (playStatus != -1) {
+            return recvVideoTotal;
+        }
+        return playStatus;
     }
 
     private String errMsg;
