@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config>
+        <domain includeSubdomains="true">playinads.com</domain>
+        <trust-anchors>
+            <certificates src="@raw/zlc" />
+            <certificates src="@raw/wwj" />
+            <certificates src="system" overridePins="true"/>
+            <certificates src="user" overridePins="true"/>
+        </trust-anchors>
+    </domain-config>
+</network-security-config>
