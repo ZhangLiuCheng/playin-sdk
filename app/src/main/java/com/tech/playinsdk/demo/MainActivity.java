@@ -1,6 +1,7 @@
 package com.tech.playinsdk.demo;
 
 import android.content.Intent;
+import android.media.AudioFormat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.tech.playinsdk.PlayInSdk;
+import com.tech.playinsdk.decoder.AudioDecoder;
 import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.listener.HttpListener;
 import com.tech.playinsdk.listener.InitListener;
@@ -25,6 +27,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initData();
 
 //        PlayInSdk.getInstance().setTest(true);
+
+
+//        AudioDecoder audioDecoder = new AudioDecoder();
+//        audioDecoder.initAudioTrack(44100, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT);
+
     }
 
     private void initData() {

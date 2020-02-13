@@ -33,6 +33,11 @@ public abstract class VideoDecoder implements Runnable {
     protected abstract void releaseDecoder();
     public abstract void updateRotate(int videoRotate);
 
+    public static VideoDecoder getDecoder(int videoWidth, int videoHeight, int videoRotate) {
+        return new FFmpegH264(videoWidth, videoHeight, videoRotate);
+//        return new MediaH264(videoWidth, videoHeight, videoRotate);
+    }
+
     public VideoDecoder(int videoWidth, int videoHeight, int videoRotate) {
         this.videoWidth = videoWidth;
         this.videoHeight = videoHeight;

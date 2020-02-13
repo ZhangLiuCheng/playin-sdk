@@ -11,12 +11,12 @@ import android.view.SurfaceView;
 
 import com.tech.playinsdk.connect.PlaySocket;
 import com.tech.playinsdk.decoder.AudioDecoder;
-import com.tech.playinsdk.decoder.FFmpegDecoder;
 import com.tech.playinsdk.decoder.VideoDecoder;
 import com.tech.playinsdk.http.HttpException;
 import com.tech.playinsdk.model.entity.PlayInfo;
 
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.SocketException;
 
@@ -71,7 +71,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         if (null != playSocket) {
             playSocket.disConnect();
         }
-        playSocket = new MyPlaySocket(playInfo.getServerIp(), playInfo.getServerPort());
+
+        playSocket = new MyPlaySocket("3.112.73.171", 20090);
+
+//        playSocket = new MyPlaySocket(playInfo.getServerIp(), playInfo.getServerPort());
         playSocket.connect();
     }
 
@@ -105,8 +108,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
                 height = playInfo.getDeviceWidth();
             }
         }
-        videodecoder = new FFmpegDecoder(width, height, rotate);
-//        videodecoder = new MediaDecoder(width, height, rotate);
+        videodecoder = VideoDecoder.getDecoder(width, height, rotate);
         videodecoder.setDecoderListener(this);
         videodecoder.start();
     }
@@ -177,10 +179,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
         @Override
         public void onOpen() {
-            PlayLog.v("MyPlaySocket --> onMessage  onOpen ");
+            PlayLog.e("MyPlaySocket --> onMessage  onOpen ");
             Analyze.getInstance().setConnectStatus();
 
-            sendUserInfo(playInfo.getToken());
+            sendUserInfo("test-token2");
+//            sendUserInfo(playInfo.getToken());
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -196,7 +199,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
         @Override
         public void onMessage(String msg) {
-            PlayLog.v("MyPlaySocket --> onMessage  msg " + msg);
+            PlayLog.e("MyPlaySocket --> onMessage  msg " + msg);
             try {
                 JSONObject object = new JSONObject(msg);
                 int code = object.optInt("code");
@@ -219,7 +222,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
 
         @Override
         public void onMessage(int streamType, byte[] buf) {
-//            PlayLog.e("MyPlaySocket --> onMessage  " + streamType + " ====  " + buf.length);
+            PlayLog.e("MyPlaySocket --> onMessage  " + streamType + " ====  " + buf.length);
             if (GameView.this.visibility == 0) {
                 if (streamType == Constants.StreamType.H264) {
                     if (null != videodecoder) videodecoder.sendVideoData(buf);
@@ -253,12 +256,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Vid
         if (playInfo.getOsType() == 1) {
             // ios 默认音频参数
             sampleRateInHz = 22050;
-            channelConfig = AudioFormat.CHANNEL_IN_MONO;
+            channelConfig = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
             audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         } else {
             // android 默认音频参数
             sampleRateInHz = 48000;
-            channelConfig = AudioFormat.CHANNEL_IN_STEREO;
+            channelConfig = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
             audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         }
         // 如果流里面有音频参数，以流里面为准

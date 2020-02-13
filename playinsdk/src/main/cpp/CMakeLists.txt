@@ -8,7 +8,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 add_library(
         playin
         SHARED
-        Playin.cpp FFmpeg.cpp)
+        Video.cpp H264.cpp Aac.cpp Audio.cpp)
 
 find_library(
         log-lib
@@ -37,5 +37,7 @@ target_link_libraries(
         ${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDROID_ABI}/libavformat.a
         ${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDROID_ABI}/libavcodec.a
         ${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDROID_ABI}/libavutil.a
+        ${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDROID_ABI}/libswscale.a
+        ${CMAKE_SOURCE_DIR}/ffmpeg/libs/${ANDROID_ABI}/libswresample.a
         ${log-lib}
 )
